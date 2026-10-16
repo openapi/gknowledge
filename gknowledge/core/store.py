@@ -204,6 +204,8 @@ class Store:
         return [Source.from_row(dict(r)) for r in cur.fetchall()]
 
     def delete_source(self, source_id: str) -> None:
+        self.delete_jobs_for_source(source_id)
+        self.delete_reviews_for_source(source_id)
         self._conn.execute("DELETE FROM sources WHERE id=?", (source_id,))
         self._conn.commit()
 
@@ -279,6 +281,10 @@ class Store:
         )
         self._conn.commit()
 
+    def delete_reviews_for_source(self, source_id: str) -> None:
+        self._conn.execute("DELETE FROM reviews WHERE source_id=?", (source_id,))
+        self._conn.commit()
+
     def list_reviews(self, status: str | None = None) -> list[ReviewItem]:
         if status:
             cur = self._conn.execute(
@@ -305,6 +311,10 @@ class Store:
                    error=:error, updated_at=:updated_at""",
             r,
         )
+        self._conn.commit()
+
+    def delete_jobs_for_source(self, source_id: str) -> None:
+        self._conn.execute("DELETE FROM jobs WHERE source_id=?", (source_id,))
         self._conn.commit()
 
     def pending_jobs(self) -> list[Job]:

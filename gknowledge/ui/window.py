@@ -78,6 +78,7 @@ class MainWindow(Adw.ApplicationWindow):
         self.app = app
         self.project: Project | None = None
         self.ingestion: IngestionManager | None = None
+        self._selected_source_id: str | None = None
         self.provider = None
 
         self.set_title(APP_NAME)
@@ -278,6 +279,7 @@ class MainWindow(Adw.ApplicationWindow):
     def set_project(self, project: Project):
         if self.project:
             self.project.close()
+        self._selected_source_id = None
         self.project = project
         self.provider = build_provider(project.settings.as_dict())
         self.ingestion = IngestionManager(project, self.provider)
@@ -340,9 +342,20 @@ class MainWindow(Adw.ApplicationWindow):
         self.ingest_btn = Gtk.Button(label="Ingest Queued")
         self.ingest_btn.add_css_class("suggested-action")
         self.ingest_btn.set_action_name("win.ingest")
+        self.reingest_btn = Gtk.Button(label="Re-ingest")
+        self.reingest_btn.set_sensitive(False)
+        self.reingest_btn.connect("clicked", self._on_reingest_source)
+        self.remove_source_btn = Gtk.Button(label="Remove")
+        self.remove_source_btn.add_css_class("destructive-action")
+        self.remove_source_btn.set_sensitive(False)
+        self.remove_source_btn.connect("clicked", self._on_remove_source)
+        source_actions = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        source_actions.append(self.reingest_btn)
+        source_actions.append(self.remove_source_btn)
         self.progress = Gtk.ProgressBar(show_text=True, visible=False)
         bottom = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8,
                          margin_top=8, margin_bottom=8, margin_start=8, margin_end=8)
+        bottom.append(source_actions)
         bottom.append(self.progress)
         bottom.append(self.ingest_btn)
 
@@ -360,8 +373,11 @@ class MainWindow(Adw.ApplicationWindow):
     def _refresh_sources(self):
         _clear_listbox(self.sources_list)
         if not self.project:
+            self._selected_source_id = None
+            self._update_source_action_buttons()
             return
         sources = self.project.store.list_sources()
+        selected_row = None
         if not sources:
             self.sources_list.append(_placeholder_row("No sources yet. Import some."))
         for s in sources:
@@ -370,12 +386,22 @@ class MainWindow(Adw.ApplicationWindow):
             row.add_prefix(Gtk.Image.new_from_icon_name("text-x-generic-symbolic"))
             row.source = s
             self.sources_list.append(row)
+            if s.id == self._selected_source_id:
+                selected_row = row
+        if selected_row:
+            self.sources_list.select_row(selected_row)
+            self._on_source_selected(self.sources_list, selected_row)
+        else:
+            self._selected_source_id = None
+            self.source_stack.set_visible_child_name("empty")
+            self._update_source_action_buttons()
         self._update_ingest_button()
 
     def _on_source_selected(self, _list, row):
         source: Source | None = getattr(row, "source", None)
         if not source or not self.project:
             return
+        self._selected_source_id = source.id
         pages = self.project.store.pages_for_source(source.id)
         writer = KnowledgeWriter(self.project)
         summary = next((p for p in pages if p.kind == PageKind.SOURCE), None)
@@ -388,6 +414,17 @@ class MainWindow(Adw.ApplicationWindow):
             body = (f"# {source.title}\n\n(Not yet ingested.)\n\n"
                     + parsers.parse(fp)[:4000])
         self._show_detail(self.source_stack, self.source_detail, body)
+        self._update_source_action_buttons()
+
+    def _update_source_action_buttons(self):
+        available = bool(
+            self._selected_source_id and self.project and self.ingestion
+            and not self.ingestion.is_running()
+        )
+        if hasattr(self, "reingest_btn"):
+            self.reingest_btn.set_sensitive(available)
+        if hasattr(self, "remove_source_btn"):
+            self.remove_source_btn.set_sensitive(available)
 
     def _update_ingest_button(self):
         if not self.project:
@@ -397,6 +434,7 @@ class MainWindow(Adw.ApplicationWindow):
         n = len(pending)
         self.ingest_btn.set_label(f"Ingest Queued ({n})" if n else "Ingest Queued")
         self.ingest_btn.set_sensitive(n > 0 and not self.ingestion.is_running())
+        self._update_source_action_buttons()
 
     # -- knowledge pane ------------------------------------------------------
     def _build_knowledge_pane(self):
@@ -636,6 +674,64 @@ class MainWindow(Adw.ApplicationWindow):
         self.toast(f"Imported {len(outcome.imported)}, "
                    f"skipped {len(outcome.skipped)} duplicate(s)")
 
+    def _on_reingest_source(self, *_a):
+        if not (self.project and self.ingestion and self._selected_source_id):
+            return
+        try:
+            source = self.ingestion.reingest_source(self._selected_source_id)
+        except (OSError, RuntimeError, ValueError) as exc:
+            self.toast(f"Could not re-ingest source: {exc}")
+            return
+        if source is None:
+            self.toast("That source no longer exists.")
+            self.refresh_all()
+            return
+        self.refresh_all()
+        self.toast(f"Re-ingesting {source.title}")
+        self._on_ingest()
+
+    def _on_remove_source(self, *_a):
+        if not (self.project and self.ingestion and self._selected_source_id):
+            return
+        source = self.project.store.get_source(self._selected_source_id)
+        if source is None:
+            self.toast("That source no longer exists.")
+            self.refresh_all()
+            return
+        dialog = Adw.MessageDialog(
+            transient_for=self,
+            heading="Remove source?",
+            body=f"Remove “{source.title}” and detach it from generated knowledge pages?",
+        )
+        dialog.add_response("cancel", "Cancel")
+        dialog.add_response("remove", "Remove")
+        dialog.set_default_response("cancel")
+        dialog.set_close_response("cancel")
+        dialog.set_response_appearance("remove", Adw.ResponseAppearance.DESTRUCTIVE)
+        dialog.connect(
+            "response",
+            lambda _dialog, response: self._remove_source(source.id)
+            if response == "remove" else None,
+        )
+        dialog.present()
+
+    def _remove_source(self, source_id: str):
+        if not (self.project and self.ingestion):
+            return
+        try:
+            source = self.ingestion.remove_source(source_id)
+        except (OSError, RuntimeError, ValueError) as exc:
+            self.toast(f"Could not remove source: {exc}")
+            return
+        if source is None:
+            self.toast("That source no longer exists.")
+            self.refresh_all()
+            return
+        self._selected_source_id = None
+        self.source_stack.set_visible_child_name("empty")
+        self.refresh_all()
+        self.toast(f"Removed source: {source.title}")
+
     def _on_ingest(self, *_a):
         if not self.ingestion or self.ingestion.is_running():
             return
@@ -667,6 +763,7 @@ class MainWindow(Adw.ApplicationWindow):
             GLib.idle_add(done)
 
         self.ingestion.start(progress=progress, on_finish=finished)
+        self._update_source_action_buttons()
 
     # -- helpers -------------------------------------------------------------
     def _warn(self, text: str):

@@ -834,8 +834,7 @@ class MainWindow(Adw.ApplicationWindow):
                 f"Draft, not saved yet · {provider}" if draft else provider)
 
     def ask_dossier_name(self, on_name):
-        dialog = Adw.AlertDialog.new("New Dossier", "Give it a name. You can start "
-                                     "working right away and choose where to keep it later.")
+        dialog = Adw.AlertDialog.new("New Dossier", None)
         entry = Gtk.Entry(placeholder_text="e.g. Buying our first home")
         dialog.set_extra_child(entry)
         dialog.add_response("cancel", "Cancel")

@@ -109,8 +109,6 @@ class GknowledgeApp(Adw.Application):
                 return
             config.add_recent_project(str(project.root.resolve()))
             self.window.set_project(project)
-            self.window.toast(f"“{project.name}” is ready. Add sources; "
-                              "you'll choose where to keep it when you save.")
 
         self.window.confirm_leave(lambda: self.window.ask_dossier_name(create))
 

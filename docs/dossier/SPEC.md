@@ -1,6 +1,6 @@
 # The Dossier format
 
-**Version 0.1, draft, 27 October 2026.** Maintained in [openapi/gknowledge](https://github.com/openapi/gknowledge). Comments and implementations from other projects are welcome; open an issue.
+**Version 0.1, draft, 27 October 2026.** Maintained in [openapi/gknowledge](https://github.com/openapi/gknowledge). Released under the MIT licence, like the rest of the repository. Comments and implementations from other projects are welcome; open an issue.
 
 A **dossier** is a folder of evidence together with the knowledge compiled from it. Every compiled statement says which evidence it comes from, and anyone can check whether that evidence is still current. This document defines the model, the on-disk layout and the rules that let any program (a desktop app, an editor plugin, a command-line tool, an AI agent) read, compile and audit the same dossier without depending on the software that created it.
 
@@ -35,7 +35,8 @@ The format has a small vocabulary. Implementations SHOULD use these names in the
 
 | Term | Definition |
 |---|---|
-| **Dossier** | The folder, identified by its manifest. It has an id, a name and a format version. |
+| **Dossier** | The folder, identified by its launcher file. It has an id, a name and a format version. |
+| **Launcher** | The `<name>.dossier` file at the top of the folder: the manifest, and the file a person double-clicks to open the dossier. |
 | **Source** | One piece of evidence: a file copied into the dossier and never modified afterwards. Its identity is the hash of its bytes. |
 | **Ledger** | The list of all sources with their hashes and, optionally, where they came from. |
 | **Page** | One unit of compiled knowledge: a Markdown file with a header that states its kind, its sources and its links. |
@@ -52,7 +53,8 @@ The format has a small vocabulary. Implementations SHOULD use these names in the
 The relationships:
 
 ```
-Dossier ─┬─ Ledger ── Source ◄────────┐ provenance (by source id)
+Dossier ─┬─ Launcher (<name>.dossier)
+         ├─ Ledger ── Source ◄────────┐ provenance (by source id)
          │                            │
          ├─ knowledge/ ── Page ───────┘
          │                 │  ▲
@@ -75,10 +77,10 @@ A dossier supports three operations. They correspond to the *ingest*, *query* an
 ## 4. Layout
 
 ```
-<dossier>/
-├── dossier.json             # manifest (REQUIRED)
-├── sources.jsonl            # ledger (REQUIRED once a source exists)
+<Name>/
+├── <Name>.dossier           # launcher and manifest (REQUIRED)
 ├── sources/                 # source files, immutable (REQUIRED)
+│   └── ledger.jsonl         # ledger (REQUIRED once a source exists)
 ├── knowledge/               # compiled pages (REQUIRED)
 │   ├── index.md             # catalogue (REQUIRED)
 │   ├── log.md               # operation log (REQUIRED)
@@ -89,14 +91,18 @@ A dossier supports three operations. They correspond to the *ingest*, *query* an
 └── .gitignore               # SHOULD exclude .dossier/
 ```
 
-- A folder is a dossier if and only if it contains a valid `dossier.json`.
+- A folder is a dossier if and only if it contains exactly one valid `*.dossier` file at its top level. The file name is free: renaming the launcher renames nothing else, and the dossier's name is the `name` field inside it.
+- What a person sees on opening the folder is part of the format: one launcher and a few folders whose names say what they hold. Everything else is hidden in `.dossier/` or in dotfiles.
+- `sources/ledger.jsonl` is the only file in `sources/` that is not a source. Implementations MUST NOT list it as one.
 - Implementations MUST ignore files and folders they do not know, and MUST NOT delete them.
 - Pages MAY be placed in the subfolders above, which are RECOMMENDED for interoperability, or anywhere under `knowledge/`. The kind of a page is stated in its header, not inferred from its folder.
 - `.dossier/` holds everything that can be rebuilt (search indexes, databases, parse caches, job queues) and everything that belongs to one machine. A dossier copied without `.dossier/` MUST lose nothing but speed.
 
 ## 5. Records
 
-### 5.1 Manifest: `dossier.json`
+### 5.1 Launcher and manifest: `<Name>.dossier`
+
+The launcher is a JSON file with the media type `application/x-dossier` and the extension `.dossier`. Desktop integrations SHOULD register that type so that opening the file opens the dossier in the user's preferred program, the way opening a `.ods` file opens a spreadsheet.
 
 ```json
 {
@@ -117,7 +123,7 @@ A dossier supports three operations. They correspond to the *ingest*, *query* an
 | `language` | no | [BCP 47](https://www.rfc-editor.org/info/bcp47) tag for the language compilers SHOULD write pages in. |
 | `description` | no | One paragraph on what the dossier is for. Compilers and agents SHOULD read it as context. |
 
-### 5.2 Ledger: `sources.jsonl`
+### 5.2 Ledger: `sources/ledger.jsonl`
 
 One JSON object per line, one line per source. The format is line-based so that version control can merge it.
 
@@ -289,10 +295,10 @@ gknowledge 0.3 predates this document and does not yet conform. The gaps, all pl
 
 | Rule | gknowledge 0.3 | Change |
 |---|---|---|
-| Manifest `dossier.json` | `gknowledge.json` with `format_version` | write `dossier.json`; read both |
-| Ledger in plain files (§5.2, §8.1) | source records only in SQLite (`index/knowledge.db`) | write `sources.jsonl`; SQLite becomes a cache in `.dossier/` |
+| Launcher `<Name>.dossier` | `gknowledge.json` with `format_version` | done for new dossiers (0.4); `gknowledge.json` still read |
+| Ledger in plain files (§5.2, §8.1) | source records only in SQLite | write `sources/ledger.jsonl`; SQLite becomes a pure cache |
 | No secrets in the folder (§8.2) | API key in `settings/settings.json` | move user and machine settings to the user configuration |
-| Derived state in `.dossier/` (§4) | `index/` and `cache/` at the root | move them; add `.gitignore` |
+| Derived state in `.dossier/` (§4) | `index/` and `cache/` at the root | done for new dossiers (0.4), with `.gitignore`; old layout still read |
 | Header field `kind` | `type` | write `kind`; read both |
 | Timestamps without microseconds | microseconds and `+00:00` | write `Z` form; read both |
 | Origin as URI | absolute path | write `file:` URIs; read both |

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/openapi/gknowledge/docs/dossier/schema/dossier.schema.json",
-  "title": "Dossier manifest (dossier.json)",
+  "title": "Dossier launcher and manifest (<Name>.dossier)",
   "type": "object",
   "required": ["dossier", "id", "name", "created"],
   "properties": {

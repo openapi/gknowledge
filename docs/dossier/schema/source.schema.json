@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/openapi/gknowledge/docs/dossier/schema/source.schema.json",
-  "title": "Ledger entry (one line of sources.jsonl)",
+  "title": "Ledger entry (one line of sources/ledger.jsonl)",
   "type": "object",
   "required": ["id", "path", "sha256", "size", "media_type", "added"],
   "properties": {

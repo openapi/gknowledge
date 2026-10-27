@@ -11,7 +11,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, Gdk, Gio, Gtk  # noqa: E402
 
 from . import APP_ID, APP_NAME, __version__, config
-from .core.project import Project
+from .core.project import Project, default_home
 from .ui.window import MainWindow
 
 
@@ -23,8 +23,10 @@ class GknowledgeApp(Adw.Application):
         self._pending_open: str | None = None
         self._pending_import: list[str] = []
 
-        self._add_action("new-project", self._on_new_project, "<primary>n")
-        self._add_action("open-project", self._on_open_project, "<primary>o")
+        self._add_action("new-dossier", self._on_new_dossier, "<primary>n")
+        self._add_action("open-dossier", self._on_open_dossier, "<primary>o")
+        self._add_action("save-dossier", self._on_save_dossier, "<primary>s")
+        self.lookup_action("save-dossier").set_enabled(False)
         self._add_action("preferences", self._on_preferences, "<primary>comma")
         self._add_action("about", self._on_about)
         self._add_action("quit", self._on_quit, "<primary>q")
@@ -46,8 +48,8 @@ class GknowledgeApp(Adw.Application):
             self.window = MainWindow(self)
         self.window.present()
         if self._pending_open:
-            self._open_path(self._pending_open)
-            self._pending_open = None
+            path, self._pending_open = self._pending_open, None
+            self.window.confirm_leave(lambda: self._open_path(path))
         else:
             self._maybe_open_last()
         # Files handed over by the file manager ("Open With") are imported
@@ -57,11 +59,11 @@ class GknowledgeApp(Adw.Application):
             if self.window.project:
                 self.window._do_import(paths)
             else:
-                self.window.toast("Open or create a project first, then import the files.")
+                self.window.toast("Open or create a dossier first, then import the files.")
 
     def do_open(self, files, n_files, hint):
-        # `gknowledge /path/to/project` opens a project; other files are
-        # imported as sources into the current (or last used) project.
+        # `gknowledge /path/to/dossier` (the folder or its .dossier launcher)
+        # opens it; other files are imported as sources into the current one.
         for gfile in files[:n_files]:
             path = gfile.get_path()
             if not path:
@@ -91,47 +93,54 @@ class GknowledgeApp(Adw.Application):
     def _open_path(self, path: str):
         try:
             project = Project.open(path)
+            path = str(project.root)
         except Exception as exc:  # noqa: BLE001
-            self.window.toast(f"Could not open project: {exc}")
+            self.window.toast(f"Could not open the dossier: {exc}")
             return
         config.add_recent_project(str(Path(path).resolve()))
         self.window.set_project(project)
 
-    def _on_new_project(self, *_a):
-        dialog = Gtk.FileDialog(title="Choose a folder for the new project")
-
-        def done(dlg, res):
+    def _on_new_dossier(self, *_a):
+        def create(name: str):
             try:
-                folder = dlg.select_folder_finish(res)
-            except Exception:
-                return
-            path = folder.get_path()
-            try:
-                project = Project.create(path, name=Path(path).name)
+                project = Project.create_draft(name)
             except Exception as exc:  # noqa: BLE001
-                self.window.toast(f"Could not create project: {exc}")
+                self.window.toast(f"Could not create the dossier: {exc}")
                 return
-            config.add_recent_project(str(Path(path).resolve()))
+            config.add_recent_project(str(project.root.resolve()))
             self.window.set_project(project)
-            self.window.toast(f"Created project “{project.name}”")
 
-        dialog.select_folder(self.window, None, done)
+        self.window.confirm_leave(lambda: self.window.ask_dossier_name(create))
 
-    def _on_open_project(self, *_a):
-        dialog = Gtk.FileDialog(title="Open a gknowledge project folder")
+    def _on_open_dossier(self, *_a):
+        dialog = Gtk.FileDialog(title="Open a Dossier")
+        filters = Gio.ListStore.new(Gtk.FileFilter)
+        dossiers = Gtk.FileFilter(name="Dossiers")
+        dossiers.add_pattern("*.dossier")
+        dossiers.add_pattern("gknowledge.json")  # created before 0.4
+        filters.append(dossiers)
+        dialog.set_filters(filters)
+        dialog.set_default_filter(dossiers)
+        home = default_home()
+        if home.is_dir():
+            dialog.set_initial_folder(Gio.File.new_for_path(str(home)))
 
         def done(dlg, res):
             try:
-                folder = dlg.select_folder_finish(res)
+                gfile = dlg.open_finish(res)
             except Exception:
                 return
-            path = folder.get_path()
+            path = gfile.get_path()
             if not Project.is_project(path):
-                self.window.toast("That folder is not a gknowledge project.")
+                self.window.toast("That file does not open a dossier.")
                 return
             self._open_path(path)
 
-        dialog.select_folder(self.window, None, done)
+        self.window.confirm_leave(lambda: dialog.open(self.window, None, done))
+
+    def _on_save_dossier(self, *_a):
+        if self.window:
+            self.window.save_draft()
 
     def _on_preferences(self, *_a):
         if self.window:
@@ -154,9 +163,11 @@ class GknowledgeApp(Adw.Application):
         about.present()
 
     def _on_quit(self, *_a):
-        if self.window and self.window.project:
-            self.window.project.close()
-        self.quit()
+        # Closing the window asks about an unsaved draft, then ends the app.
+        if self.window:
+            self.window.close()
+        else:
+            self.quit()
 
 
 def main(argv=None) -> int:

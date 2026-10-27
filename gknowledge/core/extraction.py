@@ -105,7 +105,7 @@ class ExtractionPipeline:
 
     # -- step 2 --------------------------------------------------------------
     def _mentions_path(self):
-        return self.project.root / "cache" / "mentions.json"
+        return self.project.cache_dir / "mentions.json"
 
     def _load_mentions(self) -> dict:
         try:

@@ -15,6 +15,7 @@ DATADIR     := $(PREFIX)/share
 APPSDIR     := $(DATADIR)/applications
 ICONDIR     := $(DATADIR)/icons/hicolor/scalable/apps
 METAINFODIR := $(DATADIR)/metainfo
+MIMEDIR     := $(DATADIR)/mime/packages
 
 INSTALL     := install
 
@@ -103,10 +104,14 @@ install:
 	$(INSTALL) -m 644 data/icons/hicolor/scalable/apps/$(APP_ID).svg $(DESTDIR)$(ICONDIR)/$(APP_ID).svg
 	$(INSTALL) -d $(DESTDIR)$(METAINFODIR)
 	$(INSTALL) -m 644 data/$(APP_ID).metainfo.xml $(DESTDIR)$(METAINFODIR)/$(APP_ID).metainfo.xml
+	# .dossier launcher files open in gknowledge.
+	$(INSTALL) -d $(DESTDIR)$(MIMEDIR)
+	$(INSTALL) -m 644 data/$(APP_ID).mime.xml $(DESTDIR)$(MIMEDIR)/$(APP_ID).xml
 	@# Refresh caches only for a live install; packages leave this to dpkg triggers.
 	@if [ -z "$(DESTDIR)" ]; then \
 		update-desktop-database $(APPSDIR) 2>/dev/null || true; \
 		gtk-update-icon-cache -f -t $(DATADIR)/icons/hicolor 2>/dev/null || true; \
+		update-mime-database $(DATADIR)/mime 2>/dev/null || true; \
 	fi
 	@echo ">> Done. Make sure $(BINDIR) is on your PATH, then run: gknowledge"
 
@@ -116,10 +121,12 @@ uninstall:
 	rm -f  $(DESTDIR)$(APPSDIR)/$(APP_ID).desktop
 	rm -f  $(DESTDIR)$(ICONDIR)/$(APP_ID).svg
 	rm -f  $(DESTDIR)$(METAINFODIR)/$(APP_ID).metainfo.xml
+	rm -f  $(DESTDIR)$(MIMEDIR)/$(APP_ID).xml
 	@# A stale icon cache would still point at the removed icon and leave a blank one.
 	@if [ -z "$(DESTDIR)" ]; then \
 		update-desktop-database $(APPSDIR) 2>/dev/null || true; \
 		gtk-update-icon-cache -f -t $(DATADIR)/icons/hicolor 2>/dev/null || true; \
+		update-mime-database $(DATADIR)/mime 2>/dev/null || true; \
 	fi
 	@echo ">> Uninstalled gknowledge from $(PREFIX)"
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The launcher file at the top of every dossier: double-click opens it. -->
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-dossier">
+    <comment>Dossier</comment>
+    <comment xml:lang="it">Dossier</comment>
+    <sub-class-of type="application/json"/>
+    <generic-icon name="x-office-document"/>
+    <icon name="io.github.openapi.Gknowledge"/>
+    <glob pattern="*.dossier"/>
+  </mime-type>
+</mime-info>

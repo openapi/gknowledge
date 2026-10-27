@@ -61,7 +61,10 @@ def _write_minimal_epub(path: Path, chapter: str) -> None:
 def test_project_layout(tmp_path):
     proj = make_project(tmp_path)
     assert Project.is_project(proj.root)
-    assert (proj.root / "gknowledge.json").exists()
+    assert (proj.root / "Test KB.dossier").exists()
+    assert (proj.root / ".dossier" / "index" / "knowledge.db").exists()
+    assert sorted(p.name for p in proj.root.iterdir() if not p.name.startswith(".")) == [
+        "Test KB.dossier", "knowledge", "notes", "sources"]
     assert (proj.knowledge_dir / "index.md").exists()
     assert (proj.knowledge_dir / "overview.md").exists()
     assert proj.name == "Test KB"

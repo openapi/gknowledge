@@ -10,7 +10,7 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Adw, Gio, GLib, GObject, Gtk, Pango  # noqa: E402
 
-from .. import APP_NAME, __version__
+from .. import APP_NAME, __version__, config
 from ..core.ingestion import IngestionManager
 from ..core.knowledge import KnowledgeWriter
 from ..core.lint import ChangeDetector
@@ -101,6 +101,9 @@ class MainWindow(Adw.ApplicationWindow):
         self._add_win_action("import-files", self._on_import_files)
         self._add_win_action("import-folder", self._on_import_folder)
         self._add_win_action("ingest", self._on_ingest)
+        # A draft dossier is saved to a folder when the window closes.
+        self._closing = False
+        self.connect("close-request", self._on_close_request)
 
     def _add_win_action(self, name, cb):
         action = Gio.SimpleAction.new(name, None)
@@ -111,8 +114,9 @@ class MainWindow(Adw.ApplicationWindow):
     @staticmethod
     def _primary_menu() -> Gio.Menu:
         menu = Gio.Menu()
-        menu.append("New Project…", "app.new-project")
-        menu.append("Open Project…", "app.open-project")
+        menu.append("New Dossier…", "app.new-dossier")
+        menu.append("Open Dossier…", "app.open-dossier")
+        menu.append("Save Dossier…", "app.save-dossier")
         menu.append("Preferences", "app.preferences")
         menu.append("About gknowledge", "app.about")
         menu.append("Quit", "app.quit")
@@ -122,18 +126,18 @@ class MainWindow(Adw.ApplicationWindow):
         status = Adw.StatusPage(
             icon_name="accessories-dictionary-symbolic",
             title="gknowledge",
-            description="Turn your documents, notes and links into an evolving, "
-                        "inspectable knowledge base.",
+            description="A dossier is a folder that knows what it contains: "
+                        "add documents, ask questions, get answers with sources.",
         )
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12,
                       halign=Gtk.Align.CENTER)
-        new_btn = Gtk.Button(label="New Project…")
+        new_btn = Gtk.Button(label="New Dossier…")
         new_btn.add_css_class("suggested-action")
         new_btn.add_css_class("pill")
-        new_btn.connect("clicked", lambda *_: self.app.activate_action("new-project"))
-        open_btn = Gtk.Button(label="Open Project…")
+        new_btn.connect("clicked", lambda *_: self.app.activate_action("new-dossier"))
+        open_btn = Gtk.Button(label="Open Dossier…")
         open_btn.add_css_class("pill")
-        open_btn.connect("clicked", lambda *_: self.app.activate_action("open-project"))
+        open_btn.connect("clicked", lambda *_: self.app.activate_action("open-dossier"))
         box.append(new_btn)
         box.append(open_btn)
         status.set_child(box)
@@ -204,6 +208,11 @@ class MainWindow(Adw.ApplicationWindow):
                                  GObject.BindingFlags.SYNC_CREATE |
                                  GObject.BindingFlags.BIDIRECTIONAL)
         header.pack_start(toggle)
+        self.save_btn = Gtk.Button(label="Save…", visible=False,
+                                   tooltip_text="Choose where to keep this dossier")
+        self.save_btn.add_css_class("suggested-action")
+        self.save_btn.connect("clicked", lambda *_: self.save_draft())
+        header.pack_end(self.save_btn)
         return self.split
 
     def _sync_sidebar(self, *_a):
@@ -309,7 +318,7 @@ class MainWindow(Adw.ApplicationWindow):
 
         self.set_title(f"{project.name} — {APP_NAME}")
         self.sidebar_title.set_title(project.name)
-        self.sidebar_title.set_subtitle(self.provider.name)
+        self._update_draft_state()
         self.main_stack.set_visible_child_name("workspace")
         self.refresh_all()
         self.view_stack.set_visible_child_name("sources")
@@ -320,7 +329,7 @@ class MainWindow(Adw.ApplicationWindow):
         if self.project:
             self.provider = build_provider(settings.as_dict())
             self.ingestion.set_provider(self.provider)
-            self.sidebar_title.set_subtitle(self.provider.name)
+            self._update_draft_state()
             self.toast("Provider updated")
 
     def refresh_all(self):
@@ -810,12 +819,145 @@ class MainWindow(Adw.ApplicationWindow):
         self.banner.set_title(GLib.markup_escape_text(text[:240]))
         self.banner.set_revealed(True)
 
+    # -- draft dossiers --------------------------------------------------------
+    # A new dossier only asks for a name. It lives as a draft until it is
+    # saved, on request or when the window closes, and only then gets a folder.
+    def _update_draft_state(self):
+        draft = bool(self.project and self.project.is_draft)
+        self.save_btn.set_visible(draft)
+        action = self.app.lookup_action("save-dossier")
+        if action:
+            action.set_enabled(draft)
+        if self.project:
+            provider = self.provider.name if self.provider else ""
+            self.sidebar_title.set_subtitle(
+                f"Draft, not saved yet · {provider}" if draft else provider)
+
+    def ask_dossier_name(self, on_name):
+        dialog = Adw.AlertDialog.new("New Dossier", "Give it a name. You can start "
+                                     "working right away and choose where to keep it later.")
+        entry = Gtk.Entry(placeholder_text="e.g. Strait of Messina bridge: problem or opportunity")
+        dialog.set_extra_child(entry)
+        dialog.add_response("cancel", "Cancel")
+        dialog.add_response("create", "Create")
+        dialog.set_response_appearance("create", Adw.ResponseAppearance.SUGGESTED)
+        dialog.set_response_enabled("create", False)
+        dialog.set_default_response("create")
+        dialog.set_close_response("cancel")
+        done = {"v": False}
+
+        def create():
+            name = entry.get_text().strip()
+            if name and not done["v"]:
+                done["v"] = True
+                on_name(name)
+
+        entry.connect("changed", lambda e: dialog.set_response_enabled(
+            "create", bool(e.get_text().strip())))
+        entry.connect("activate", lambda *_: (create(), dialog.close()))
+        dialog.connect("response", lambda _d, r: create() if r == "create" else None)
+        dialog.present(self)
+        entry.grab_focus()
+
+    def save_draft(self, then=None):
+        """Give the draft a folder: the default home, or one the user picks."""
+        if not (self.project and self.project.is_draft):
+            if then:
+                then()
+            return
+        if self.ingestion and self.ingestion.is_running():
+            self.toast("Wait for the sources to finish processing, then save.")
+            return
+        from ..core.project import default_home
+        dest = self.project.suggested_folder()
+        shown = str(dest).replace(str(Path.home()), "~", 1)
+        dialog = Adw.AlertDialog.new(f"Save “{self.project.name}”",
+                                     f"The dossier will be kept in\n{shown}")
+        dialog.add_response("cancel", "Cancel")
+        dialog.add_response("other", "Choose Another Folder…")
+        dialog.add_response("save", "Save")
+        dialog.set_response_appearance("save", Adw.ResponseAppearance.SUGGESTED)
+        dialog.set_default_response("save")
+        dialog.set_close_response("cancel")
+
+        def picked(dlg, res):
+            try:
+                folder = dlg.select_folder_finish(res)
+            except Exception:  # noqa: BLE001  (cancelled)
+                return
+            self._materialize(self.project.suggested_folder(folder.get_path()), then)
+
+        def on_response(_d, response):
+            if response == "save":
+                self._materialize(dest, then)
+            elif response == "other":
+                home = default_home()
+                chooser = Gtk.FileDialog(title="Choose where to keep the dossier")
+                if home.is_dir():
+                    chooser.set_initial_folder(Gio.File.new_for_path(str(home)))
+                chooser.select_folder(self, None, picked)
+
+        dialog.connect("response", on_response)
+        dialog.present(self)
+
+    def _materialize(self, dest: Path, then=None):
+        draft = self.project
+        try:
+            saved = draft.materialize(dest)
+        except Exception as exc:  # noqa: BLE001
+            self.toast(f"Could not save the dossier: {exc}")
+            return
+        self.project = None  # the draft is closed and gone
+        config.replace_recent_project(str(draft.root.resolve()), str(saved.root.resolve()))
+        self.set_project(saved)
+        self.toast(f"Saved to {str(saved.root).replace(str(Path.home()), '~', 1)}")
+        if then:
+            then()
+
+    def confirm_leave(self, then):
+        """Run ``then`` now, or after asking what to do with an unsaved draft."""
+        if not (self.project and self.project.is_draft):
+            then()
+            return
+        dialog = Adw.AlertDialog.new(
+            f"Save “{self.project.name}”?",
+            "This dossier is still a draft. Save it to a folder to keep it "
+            "with your files, or keep it as a draft and come back to it later.")
+        dialog.add_response("cancel", "Cancel")
+        dialog.add_response("draft", "Keep as Draft")
+        dialog.add_response("save", "Save…")
+        dialog.set_response_appearance("save", Adw.ResponseAppearance.SUGGESTED)
+        dialog.set_default_response("save")
+        dialog.set_close_response("cancel")
+
+        def on_response(_d, response):
+            if response == "draft":
+                then()
+            elif response == "save":
+                self.save_draft(then)
+
+        dialog.connect("response", on_response)
+        dialog.present(self)
+
+    def _on_close_request(self, *_a):
+        if self._closing or not (self.project and self.project.is_draft):
+            if self.project:
+                self.project.close()
+            return False
+
+        def proceed():
+            self._closing = True
+            self.close()
+
+        self.confirm_leave(proceed)
+        return True
+
     def toast(self, text: str):
         self.toasts.add_toast(Adw.Toast(title=text, timeout=3))
 
     def open_preferences(self):
         if not self.project:
-            self.toast("Open a project first")
+            self.toast("Open a dossier first")
             return
         dlg = PreferencesDialog(self, self.project, self.on_settings_saved)
         dlg.present()

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/openapi/gknowledge/docs/dossier/schema/source.schema.json",
+  "title": "Ledger entry (one line of sources.jsonl)",
+  "type": "object",
+  "required": ["id", "path", "sha256", "size", "media_type", "added"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "path": {"type": "string", "pattern": "^sources/[^/].*$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "size": {"type": "integer", "minimum": 0},
+    "media_type": {"type": "string", "pattern": "^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$"},
+    "title": {"type": "string"},
+    "added": {"type": "string", "format": "date-time"},
+    "origin": {"type": "string", "format": "uri"}
+  },
+  "patternProperties": {"^x-": {}},
+  "additionalProperties": true
+}

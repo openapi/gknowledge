@@ -2,6 +2,8 @@
 
 The original product and design document, kept as the long-term direction. The user-facing overview is in the [README](../README.md).
 
+The on-disk format is specified separately, as an open format other programs can implement: [The Dossier format](dossier/SPEC.md).
+
 ## Status
 
 This repository contains **a working MVP** of the native application plus the

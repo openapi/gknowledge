@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/openapi/gknowledge/docs/dossier/schema/dossier.schema.json",
+  "title": "Dossier launcher and manifest (<Name>.dossier)",
+  "type": "object",
+  "required": ["dossier", "id", "name", "created"],
+  "properties": {
+    "dossier": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$", "description": "Format version, MAJOR.MINOR."},
+    "id": {"type": "string", "minLength": 1},
+    "name": {"type": "string", "minLength": 1},
+    "created": {"type": "string", "format": "date-time"},
+    "language": {"type": "string", "description": "BCP 47 language tag."},
+    "description": {"type": "string"}
+  },
+  "patternProperties": {"^x-": {}},
+  "additionalProperties": true
+}

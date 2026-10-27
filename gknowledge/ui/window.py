@@ -836,7 +836,7 @@ class MainWindow(Adw.ApplicationWindow):
     def ask_dossier_name(self, on_name):
         dialog = Adw.AlertDialog.new("New Dossier", "Give it a name. You can start "
                                      "working right away and choose where to keep it later.")
-        entry = Gtk.Entry(placeholder_text="e.g. Strait of Messina bridge: problem or opportunity")
+        entry = Gtk.Entry(placeholder_text="e.g. Buying our first home")
         dialog.set_extra_child(entry)
         dialog.add_response("cancel", "Cancel")
         dialog.add_response("create", "Create")

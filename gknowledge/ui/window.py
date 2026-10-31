@@ -620,29 +620,94 @@ class MainWindow(Adw.ApplicationWindow):
 
     def _on_review_selected(self, _list, row):
         item = getattr(row, "item", None)
-        if not item:
+        if not item or not self.project:
             return
-        self._show_detail(self.review_stack, self.review_detail,
-                          f"# {item.title}\n\n_{item.action.value}_\n\n{item.detail}")
+        source = self.project.store.get_source(item.source_id) if item.source_id else None
+        source_section = "\n\n## Source\n"
+        if source:
+            source_section += (
+                f"**{source.title}**\n\n"
+                f"- File: `{source.rel_path}`\n"
+                f"- Status: {source.status.value}"
+            )
+            source_page = next(
+                (page for page in self.project.store.pages_for_source(source.id)
+                 if page.kind == PageKind.SOURCE),
+                None,
+            )
+            if source_page and source_page.summary:
+                source_section += f"\n\n{source_page.summary}"
+        else:
+            source_section += "_The original source is no longer available._"
+        query_section = ""
+        if item.queries:
+            query_section = "\n\n## Questions / research prompts\n" + "\n".join(
+                f"- {query}" for query in item.queries
+            )
+        detail = (
+            f"# {item.title}\n\n"
+            f"**Type:** {item.action.value}\n\n"
+            f"{item.detail}"
+            f"{query_section}"
+            f"{source_section}"
+        )
+        self._show_detail(self.review_stack, self.review_detail, detail)
 
     def _refresh_reviews(self):
         _clear_listbox(self.review_list)
         if not self.project:
             return
         items = self.project.store.list_reviews(status="open")
-        if not items:
-            self.review_list.append(_placeholder_row("No items awaiting review."))
-            return
-        for item in items:
-            row = Adw.ActionRow(
-                activatable=True,
-                title=GLib.markup_escape_text(item.title),
-                subtitle=f"{item.action.value} · {item.detail}")
-            btn = Gtk.Button(label="Resolve", valign=Gtk.Align.CENTER)
-            btn.connect("clicked", self._on_resolve, item.id)
-            row.add_suffix(btn)
-            row.item = item
-            self.review_list.append(row)
+        questions = [item for item in items if item.is_question]
+        needs_review = [item for item in items if not item.is_question]
+
+        self.review_list.append(_section_header_row("Questions to explore"))
+        if questions:
+            for item in questions:
+                row = Adw.ActionRow(
+                    activatable=True,
+                    title=GLib.markup_escape_text(item.title),
+                    subtitle=item.detail,
+                )
+                ask_btn = Gtk.Button(label="Ask", valign=Gtk.Align.CENTER)
+                ask_btn.add_css_class("suggested-action")
+                ask_btn.connect("clicked", self._on_ask_review, item)
+                dismiss_btn = Gtk.Button(label="Dismiss", valign=Gtk.Align.CENTER)
+                dismiss_btn.connect("clicked", self._on_dismiss_review, item.id)
+                row.add_suffix(ask_btn)
+                row.add_suffix(dismiss_btn)
+                row.item = item
+                self.review_list.append(row)
+        else:
+            self.review_list.append(_placeholder_row("No open questions."))
+
+        self.review_list.append(_section_header_row("Needs review"))
+        if needs_review:
+            for item in needs_review:
+                row = Adw.ActionRow(
+                    activatable=True,
+                    title=GLib.markup_escape_text(item.title),
+                    subtitle=f"{item.action.value} · {item.detail}",
+                )
+                btn = Gtk.Button(label="Resolve", valign=Gtk.Align.CENTER)
+                btn.connect("clicked", self._on_resolve, item.id)
+                row.add_suffix(btn)
+                row.item = item
+                self.review_list.append(row)
+        else:
+            self.review_list.append(_placeholder_row("Nothing needs review."))
+
+    def _on_ask_review(self, _btn, item):
+        question = item.queries[0] if item.queries else item.title
+        self.query_entry.set_text(question)
+        self.view_stack.set_visible_child_name("assistant")
+        self._on_ask()
+
+    def _on_dismiss_review(self, _btn, review_id):
+        self.project.store.resolve_review(review_id)
+        self._refresh_reviews()
+        self._update_counts()
+        self.toast("Question dismissed")
 
     def _on_resolve(self, _btn, review_id):
         self.project.store.resolve_review(review_id)
@@ -842,6 +907,16 @@ def _clear_listbox(lb: Gtk.ListBox):
 def _clear_box(box: Gtk.Box):
     while (child := box.get_first_child()) is not None:
         box.remove(child)
+
+
+def _section_header_row(text: str) -> Gtk.ListBoxRow:
+    row = Gtk.ListBoxRow(activatable=False, selectable=False)
+    label = Gtk.Label(label=text, xalign=0, margin_start=12,
+                      margin_top=14, margin_bottom=6)
+    label.add_css_class("heading")
+    label.add_css_class("dim-label")
+    row.set_child(label)
+    return row
 
 
 def _placeholder_row(text: str) -> Gtk.ListBoxRow:

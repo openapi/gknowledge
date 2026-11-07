@@ -23,8 +23,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: build-aux/deb/build-deb.sh dist
+      - run: dpkg-deb -I dist/*.deb
       - run: |
-          dpkg-deb -I dist/*.deb
+          sudo apt-get update
           sudo apt-get install -y ./dist/*.deb
           python3 -c "import gknowledge" 2>/dev/null || PYTHONPATH=/usr/share/gknowledge python3 -c "import gknowledge; print(gknowledge.__version__)"
   flatpak:

@@ -17,7 +17,9 @@ DEB_DIR=$1
 BUNDLE=$2
 OUT=$3
 BASE_URL=${4%/}
-APP_ID=io.gknowledge.Gknowledge
+APP_ID=io.github.openapi.Gknowledge
+# Until 0.3.0 the app was io.gknowledge.Gknowledge (a domain nobody owns).
+OLD_ID=io.gknowledge.Gknowledge
 : "${GPG_KEY_ID:?set GPG_KEY_ID to the signing key}"
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 
@@ -68,6 +70,12 @@ ostree init --mode=archive-z2 --repo="$FP"
 # Only affects building; a nearly full build disk should not abort the import.
 ostree config --repo="$FP" set core.min-free-space-percent 0
 flatpak build-import-bundle --gpg-sign="$GPG_KEY_ID" "$FP" "$BUNDLE"
+# Installs of the old ID move to the new one on the next `flatpak update`,
+# and Flatpak carries ~/.var/app/$OLD_ID over with them.
+for ref in $(ostree refs --repo="$FP" | grep "^app/$APP_ID/"); do
+  flatpak build-commit-from --gpg-sign="$GPG_KEY_ID" --src-ref="$ref" \
+    --end-of-life-rebase="$OLD_ID=$APP_ID" "$FP" "app/$OLD_ID/${ref#app/$APP_ID/}"
+done
 flatpak build-update-repo --gpg-sign="$GPG_KEY_ID" --generate-static-deltas \
   --title=gknowledge --default-branch=master "$FP"
 
@@ -94,6 +102,8 @@ RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo
 IsRuntime=false
 GPGKey=$KEY_B64
 EOF
+# Links to the old .flatpakref keep working and install the new ID.
+cp "$OUT/$APP_ID.flatpakref" "$OUT/$OLD_ID.flatpakref"
 cp "$ROOT/data/icons/hicolor/scalable/apps/$APP_ID.svg" "$OUT/"
 
 # --- Landing page -----------------------------------------------------------

@@ -219,7 +219,7 @@ L'accettazione su Flathub è basata su regole ed è veloce: le cinque app compar
 |---|---|---|
 | Runtime "the latest version at that time of submission"; runtime EOL rifiutati | `org.gnome.Platform` **46** | Passare al runtime corrente (Alpaca e Newelle sono su GNOME 50; il Circle ha chiesto ai membri di abbandonare il 49 entro il 10 ottobre 2026) ([requirements](https://docs.flathub.org/docs/for-app-authors/requirements); [Circle #280](https://gitlab.gnome.org/Teams/Circle/-/issues/280)) |
 | Sorgenti con URL pubblici; "built entirely from source code"; nessun binario nel PR | `sources: type: dir, path: ../..` | Usare `type: git` con tag o `type: archive` con sha256 su una release GitHub; vendorizzare `pypdf` come wheel offline (pattern `flatpak-pip-generator`, come Alpaca) ([manifest Alpaca](https://github.com/flathub/com.jeffser.Alpaca/blob/master/com.jeffser.Alpaca.yml)) |
-| ID app: dominio controllato dall'autore con `.well-known/org.flathub.VerifiedApps.txt`, oppure `io.github.<owner>.<App>` | `io.gknowledge.Gknowledge` | Verificare se il dominio `gknowledge.io` è controllato (serve HTTPS e il token); altrimenti rinominare in `io.github.<owner>.Gknowledge` prima della sottomissione, perché Flathub rifiuta rinomine subito dopo l'accettazione ([requirements](https://docs.flathub.org/docs/for-app-authors/requirements); [verification](https://docs.flathub.org/docs/for-app-authors/verification)) |
+| ID app: dominio controllato dall'autore con `.well-known/org.flathub.VerifiedApps.txt`, oppure `io.github.<owner>.<App>` | `io.gknowledge.Gknowledge` → **`io.github.openapi.Gknowledge` dalla 0.3.0** (19 ott 2026: gknowledge.io non registrato, openapi.io in vendita; il remote su Pages fa end-of-life-rebase dal vecchio ID) | ~~Verificare se il dominio `gknowledge.io` è controllato (serve HTTPS e il token); altrimenti rinominare in `io.github.<owner>.Gknowledge` prima della sottomissione~~ fatto; Flathub rifiuta rinomine subito dopo l'accettazione ([requirements](https://docs.flathub.org/docs/for-app-authors/requirements); [verification](https://docs.flathub.org/docs/for-app-authors/verification)) |
 | MetaInfo valida: screenshot, developer name, licenza, release con data, content rating; "warnings fatal", nessuna eccezione per `appstream-missing-screenshots` e `appstream-missing-developer-name` | metainfo con `summary`, `description`, `project_license` MIT, `content_rating`, una release 0.1.0; **mancano screenshot, `developer`, `url` (homepage, bugtracker), `branding`** | Completare il MetaInfo e validarlo con `flatpak-builder-lint` ([linter](https://docs.flathub.org/docs/for-app-authors/linter)) |
 | "Static permissions must be kept to an absolute minimum"; portali obbligatori dove esistono | `--filesystem=home` | Vedi 5.4 |
 | "Applications that have only existed for a very short period of time will generally not be accepted"; solo software stabile | release 0.1.0 datata 2026-07-07 | Sottomettere con una 0.2/0.3 testata, non con l'MVP |
@@ -293,3 +293,291 @@ Il percorso seguente "ripercorre i passi" dei progetti studiati nell'ordine in c
 **Canale GNOME/Linux.** Alpaca (https://github.com/Jeffser/Alpaca; https://jeffser.com/alpaca/; flathub PR #5239, #5552, #6252; manifest com.jeffser.Alpaca.yml; Flathub stats/appstream/verification; Circle #230; AUR alpaca-ai; Repology; Ubuntu Handbook; Forbes; FOSS Force; TWIG #195, #234); Newelle (https://github.com/qwersyk/Newelle; https://newelle.qsk.me/; PR #4284; manifest; stats; AUR; Phoronix 1.0/1.2/image gen; TWIG #195, #202, #210, #233, #250, #255, #263); Bavarder/Imaginer (PR #4108, #4109, #4123; stats; TWIG #96); Moose (TWIG #268); Reins (TWIG #129); Apostrophe (GitLab; Circle #3, #215; stats; Repology); Iotas (PR #4877; Circle #238; stats); Folio; Planify (Circle #186; stats); Flathub docs: requirements, submission, linter, quality-guidelines, verification, maintenance, blog "Raising the Bar", "App safety", "Vorarbeiter"; flathub-infra/website safety.ts; Flathub API stats, permissions, search, openapi.json; GamingOnLinux (maggio 2026, policy AI); GNOME Circle: Teams/Circle README, AppCriteria.md, membership_guide.md, apps.json, issue #274, #280; Sophie Herold 2026-05-29; Fellowship Update 2026-10-07; Linuxiac 2026-05-30.
 
 **Repository gknowledge.** `README.md`, `data/io.gknowledge.Gknowledge.metainfo.xml`, `build-aux/flatpak/io.gknowledge.Gknowledge.yaml` (letti il 12 ottobre 2026).
+
+## 8. Registro dei canali e delle ricerche già fatte
+
+> **Aggiornato al 14 ottobre 2026; il punto al 19 ottobre è in §10, il giro sull'engagement del 27 ottobre in §10.5.** Questa sezione evita di ripetere le stesse indagini: elenca dove gknowledge è già stato proposto, con quale esito, quali piattaforme coprono i competitor e quali ricerche non hanno prodotto nulla. Prima di cercare nuovi canali, aggiornare questa sezione. I testi pronti da incollare sono in [`docs/launch/`](docs/launch/) (`directories.md`, `outreach.md`, `blog-post.md`, `zh.md`, `emerging.md`).
+
+### 8.1 Stato delle candidature
+
+| Canale | Tipo | Data | Stato | Prossimo passo |
+|---|---|---|---|---|
+| [awesome-llm-wiki #12](https://github.com/gavischneider/awesome-llm-wiki/pull/12) | lista awesome (219★, la lista di categoria: nashsu, Tolaria, OpenKnowledge) | 14 ott 2026 | **merged** il 14 ott; ringraziato l'autore il 15 ott con link all'org | nessuno |
+| [awesome-opensource-ai #840](https://github.com/alvinreal/awesome-opensource-ai/pull/840) | lista awesome (4.884★, accanto a Khoj e Newelle) | 14 ott 2026 | **merged** il 15 ott; ringraziato l'autore con link all'org | nessuno |
+| [awesome-gtk #465](https://github.com/valpackett/awesome-gtk/pull/465) | lista awesome (1.268★, Note-taking accanto a Iotas/Folio) | 14 ott 2026 | chiusa il 19 ott su richiesta del maintainer (vedi la riga awesome-gtk più sotto) | — |
+| [Karpathy-LLM-Wiki-Stack](https://github.com/ScrapingArt/Karpathy-LLM-Wiki-Stack/issues/3) | blueprint (94★, tabella risorse con nashsu) | 14 ott 2026 | **accettato** il 27 ott: dopo la [issue #3](https://github.com/ScrapingArt/Karpathy-LLM-Wiki-Stack/issues/3) il maintainer ha aggiunto la riga in §19 con la [PR #4](https://github.com/ScrapingArt/Karpathy-LLM-Wiki-Stack/pull/4) ("young, single-maintainer, Linux-only… not tested"), e ha detto che non farà la revisione di fedeltà al pattern. Ringraziato, con l'invito a seguire l'org e la nostra posizione sui dati certificati | nessuna |
+| AlternativeTo | directory | 14 ott 2026 | scheda inviata (coda gratuita, autore "Openapi"), 16 alternative collegate: Reor, Khoj, OpenKnowledge, Tolaria, Gemini Notebook (= NotebookLM), Mempipe, Obsidian, Logseq, SiYuan, Trilium, Zettlr, AnythingLLM, PrivateGPT, Open Notebook, Blinko, Nodus | attendere revisione; non condividere il link prima. La priorità costa $5 |
+| OpenAlternative | directory | 14 ott 2026 | **non inviata**: servono 250★ per repo con meno di 6 mesi (50★ dal 7 gen 2027) e un sito su dominio proprio; le schede gratuite escono una al giorno lavorativo | riprovare con `gknowledge.io` attivo |
+| EveryDev.ai | directory di AI dev tools (c'è OpenKnowledge) | 14 ott 2026 | login GitHub fatto; serve completare l'onboarding del profilo prima di `/create/tool` | completare onboarding, poi compilare con `directories.md` |
+| ClaudeKit (claudekit.io) | sito coreano curato a mano di strumenti per Claude Code (c'è nashsu) | 14 ott 2026 | **non raggiungibile**: nessun form, repo o contatto | nessuno |
+| dev.to | articolo | 13 ott 2026 | [pubblicato](https://dev.to/francescobianco/i-turned-karpathys-llm-wiki-into-a-native-gnome-app-and-it-works-offline-130c). 17 ott: [commento di Justin (@fromthearchitect)](https://dev.to/fromthearchitect/comment/3i4d5), data/AI architect su Fedora che sta scrivendo un'app foto GNOME in Rust. Ha messo la stella; il `.deb` e `install.sh` non gli servono e chiede il Flatpak (non ha visto il remote su Pages: badge e tabella del README dicevano ancora "Flatpak planned"). Consiglia di sviluppare nel runtime GNOME e osserva che le pagine invecchiano per drift delle sorgenti, non per allucinazioni. Da qui nascono il controllo "stale sources" e `make start-flatpak` (PR #42, mergiato il 19 ott; il PR #43 corregge il click nella sidebar) | **risposto il 19 ott** dall'utente, dopo il rilascio della 0.3.0 con il Flatpak; ringraziato anche nell'[annuncio della 0.3](https://github.com/orgs/openapi/discussions/72). **Lui ha risposto la sera del 19 ott** ([commento](https://dev.to/fromthearchitect/comment/3ia9i)): apprezza `stale_sources` via MCP e il fix WAL/document portal, autorizza il link alla [Parte 1](https://fromthearchitect.dev/posts/gnome-rust-part-1-getting-started/) della sua serie (aggiunto in CONTRIBUTING il 20 ott), proverà il Flatpak su Fedora 44 in settimana e aprirà issue (GitHub `justinf555`): smistarle per prime. **27 ott** ([commento](https://dev.to/fromthearchitect/comment/3iek7)): il Flatpak su Fedora 44 funziona, nessun problema; ringrazia per il link e segnala che la serie continua (è alla Parte 6 più un bonus). CONTRIBUTING ora linka la [pagina della serie](https://fromthearchitect.dev/series/building-gnome-apps-with-rust/). **Risposto dall'utente il 27 ott**: grazie, link aggiornato, proposta di usare la sua serie come base di conoscenza demo di gknowledge (con link a ogni post, risultato mostrato a lui prima di pubblicare); attendere la sua risposta. Commentare con contenuto tecnico i suoi articoli recenti sulle liste GTK4 (0–1 reazioni), senza chiedere stelle. Più avanti: cross-promozione tra app GNOME e, se il rapporto cresce, co-maintainer per il packaging (§6). Ripubblicare su Medium con canonical a dev.to |
+| Theo James (Medium, editor di *Better Workflow*) | classifica "8 Apps… Karpathy-Style LLM Knowledge Base" | 14 ott 2026 | testo pronto in `outreach.md` (risposta all'articolo o pitch alla pubblicazione); nessun contatto esterno | inviare da account Medium |
+| Prahlad G. Menon (themenonlab.blog) | blog che ha coperto Tolaria e OKF | 14 ott 2026 | email pronta in `outreach.md` (prahlad.menon@quant.md) | inviare |
+| awesome-gnome (1.622★, c'è Newelle) | lista awesome | — | **saltata**: richiede release stabili mature | proporre dopo Flathub |
+| HelloGitHub #3956, ruanyf/weekly #12333, OpenGithubs/monthly #33 | newsletter cinesi via issue | 13 ott 2026 | inviate | controllare risposte |
+| V2EX, Juejin, LINUX DO | comunità cinesi | 13 ott 2026 | bloccate (invito, telefono, codice) | testi in `docs/launch/zh.md` |
+| [up-for-grabs #6258](https://github.com/up-for-grabs/up-for-grabs.net/pull/6258) | elenco di progetti per principianti | 13 ott 2026 | **merged** | nessuno |
+| [awesome-for-beginners #2143](https://github.com/MunGell/awesome-for-beginners/pull/2143) | lista per principianti (90k★, pubblico forte in India e Africa) | 14 ott 2026 | PR aperta (`data.json`, Python, `good first issue`) | attendere merge |
+| [awesome-hacktoberfest-2026 #22](https://github.com/Piyushhbhutoria/awesome-hacktoberfest-2026/pull/22) | lista Hacktoberfest (62★), sezione Coding for Beginners | 15 ott 2026 | PR aperta; ultimo merge del maintainer a nov 2025 | attendere merge |
+| [ollama/ollama #19001](https://github.com/ollama/ollama/pull/19001) | README Community Integrations (183k★), sezione RAG & Knowledge Bases | 14 ott 2026 | PR aperta; 80+ PR README in coda, merge rari | attendere |
+| [awesome-context-engineering #88](https://github.com/yzfly/awesome-context-engineering/pull/88) | lista awesome (211★, molto attiva, merge quasi quotidiani), sezione Memory & Compression accanto a LWC e Dory | 16 ott 2026 | **mergiata il 24 ott** da yzfly (EN + CN). La #69 per openapi-llm-wiki era stata chiusa come "vendor-specific catalog": il maintainer vuole metodi o strumenti riutilizzabili, descritti per meccanismo; ringraziato sulla #69 con link alla #88. Il 27 ott ringraziato sulla #88 con invito a guardare e seguire l'org | — |
+| [PyPI `gknowledge-mcp`](https://pypi.org/project/gknowledge-mcp/) + [registro MCP ufficiale](https://registry.modelcontextprotocol.io/v0/servers?search=gknowledge) | pacchetto e registro MCP (`io.github.openapi/gknowledge`) | 16 ott 2026 | **pubblicati** 0.2.2 dal workflow `mcp.yml` (trusted publishing + OIDC); `uvx gknowledge-mcp --init` verificato. awesome-mcp-servers: [#16623](https://github.com/punkpeye/awesome-mcp-servers/pull/16623) chiusa il 16 ott (chiesto un server per PR), divisa il 19 ott in [#16968](https://github.com/punkpeye/awesome-mcp-servers/pull/16968) (mcp-server) e [#16969](https://github.com/punkpeye/awesome-mcp-servers/pull/16969) (gknowledge). 27 ott: mcp-server rivendicato su Glama, voto B, punkpeye ringraziato sulla #16968; gknowledge inviato a Glama: email di rifiuto ("descrive un'app GNOME, non un server MCP"), ma la scheda `openapi/gknowledge` è comparsa comunque con voto A (il reinvio come `gknowledge-mcp` è stato rifiutato come doppione). Badge aggiunto nella #16969, punkpeye ringraziato | attendere il merge delle due PR. Controllare PulseMCP |
+| [awesome-gtk](https://github.com/valpackett/awesome-gtk/pull/465) | lista awesome GTK (Office → Note-taking) | 19 ott 2026 | il maintainer (GerryT11) chiede di aspettare: progetto troppo giovane (prima release 13 ott). Ringraziato e PR chiusa | riproporre (riaprire #465 o nuova PR, menzionando GerryT11) dopo la release su Flathub e qualche mese di release |
+| PyCoder's Weekly | newsletter Python (form Google) | 14 ott 2026 | modulo compilato, **invio bloccato** dal classificatore auto mode | inviare a mano con i testi di `emerging.md` |
+| TabNews, r/developersIndia, Hashnode, Viblo, Techpoint Africa, organizzatori Hack Day | comunità e stampa in Africa e paesi emergenti | 14 ott 2026 | testi pronti in `emerging.md` | pubblicare dal proprio account; r/developersIndia solo nel thread Showcase dell'8 nov |
+
+### 8.2 Dove i competitor prendono visibilità
+
+Mappa delle piattaforme trovate il 14 ottobre 2026, raggruppate per modo di accesso.
+
+**Liste awesome e curate su GitHub** (ricerca: README che linkano `nashsu/llm_wiki`, `refactoringhq/tolaria`, `inkeep/open-knowledge`, `Jeffser/Alpaca`, `qwersyk/Newelle`):
+
+| Lista | ★ | Esito |
+|---|---|---|
+| gavischneider/awesome-llm-wiki | 219 | PR #12 merged |
+| alvinreal/awesome-opensource-ai | 4.884 | PR #840 merged |
+| valpackett/awesome-gtk | 1.268 | PR #465 |
+| Kazhnuz/awesome-gnome | 1.622 | rimandata (maturità) |
+| ScrapingArt/Karpathy-LLM-Wiki-Stack | 94 | riga in §19 (PR #4, 27 ott) |
+| weijt606/ai-agent-map | 75 | non valutata a fondo |
+| fsaint/bestOfSecondBrainLLM, zhuyansen/awesome-obsidian-ai-skills, tech-anupam/awesome-agentic-ecosystem, scholar-zishan/awesome-opensource-ai, csells/awesome-jarvis | 0–13 | scartate: traffico nullo |
+| uhub/awesome-llm, uhub/awesome-typescript | — | generate dai topic GitHub: dipendono dai topic del repo |
+| raccolte "awesome-stars" personali, github-trending archive | — | automatiche, non sollecitabili |
+
+**Directory di software:** AlternativeTo (OpenKnowledge, Reor, Khoj), OpenAlternative (Tolaria), openapps.pro (Tolaria), EveryDev.ai (OpenKnowledge), skills-hub.ai (OpenKnowledge), ClaudeKit (nashsu), winget GUI e wingetly (nashsu, solo Windows), OnWorks (pagine Linux generate automaticamente).
+
+**Aggregatori automatici** (si attivano con stelle e GitHub Trending, non si sollecitano): SourcePulse, gittrend.io, heatdrop.ai, feedbagel, Trendshift, gitblind, AIToolly (ha coperto nashsu dal trending in più lingue).
+
+**Articoli e blog** (si raggiungono contattando l'autore):
+
+| Piattaforma | Cosa ha coperto | Accesso |
+|---|---|---|
+| [Medium, Theo James](https://medium.com/@theo-james/karpathy-style-llm-knowledge-base-apps-ba4735322be9) | classifica di 8 app (NotebookLM, Recall, Obsidian, Khoj, AnythingLLM, Quivr, Heptabase, Constella sponsorizzato) | risposta Medium, pubblicazione *Better Workflow* |
+| [Medium, Kristopher Dunham](https://medium.com/@creativeaininja/this-open-source-app-turns-your-documents-into-a-self-building-wiki-b3b5778903dd) | recensione di nashsu, finita in awesome-llm-wiki | risposta Medium |
+| [Stackademic](https://blog.stackademic.com/rag-is-dead-llm-wiki-andrej-karpathys-idea-is-what-comes-next-a71fa3c414a4) | "RAG is dead, LLM Wiki is next" | pubblicazione Medium aperta a contributi |
+| [themenonlab.blog](https://themenonlab.blog/blog/tolaria-karpathy-llm-wiki-desktop-app) | Tolaria, Google OKF | email (vedi `outreach.md`) |
+| [AI Chat Daily](https://www.aichatdaily.com/ai-tools/karpathy-s-llm-wiki-idea-spawns-cottage-industry) | il fenomeno LLM Wiki | da contattare |
+| [The AI Operator](https://theaioperator.io/p/i-rebuilt-karpathys-llm-wiki-heres) | Substack sul pattern | da contattare |
+| [AFFiNE blog](https://affine.pro/blog/llm-wiki), [Denser](https://denser.ai/blog/llm-wiki-karpathy-knowledge-base/), [SmartScope](https://smartscope.blog/en/blog/llm-wiki-context-architecture/), [Pebblous](https://blog.pebblous.ai/report/karpathy-llm-wiki/en/), Neo4j | blog di vendor che spiegano il pattern e citano nashsu | basso valore, vendor concorrenti |
+| [Towards Data Science](https://towardsdatascience.com/llm-wikis-are-over-engineered-i-replaced-mine-with-a-pure-python-compiler/) | articolo critico sugli LLM wiki | accetta articoli esterni |
+| [PromptZone](https://www.promptzone.com/paulina_laurent/openknowledge-open-source-ai-note-taking-tool-5gal), [braindetox.kr](https://braindetox.kr/en/posts/openknowledge_obsidian_alternative_2026.html) (4 lingue) | OpenKnowledge | community aperta / autore |
+| [drweb.de](https://www.drweb.de/openknowledge-der-quelloffene-markdown-editor-der-mit-claude-und-codex-zusammenarbeitet/) (DE), [logicity.in](https://logicity.in/en/blog/openknowledge-open-source-ai-editor-takes-on-obsidian), [pyshine.com](https://pyshine.com/LLM-Wiki-Personal-Knowledge-Base-That-Builds-Itself/), [ecosistemastartup.com](https://ecosistemastartup.com/tolaria-app-open-source-macos-para-gestionar-conocimiento-en-markdown/) (ES) | OpenKnowledge, nashsu, Tolaria | redazioni da contattare |
+| [PromptQuorum](https://www.promptquorum.com/power-local-llm/khoj-ai-second-brain-review) | recensione di Khoj (LLM locali) | da contattare |
+| [Platformer](https://www.platformer.news/karpathy-llm-wiki-journalism-productivity/), [Implicator](https://implicator.ai/karpathys-llm-wiki-got-16-million-views-the-code-isnt-the-point-2/), TechTimes, AI Weekly | stampa sul pattern e su OpenKnowledge (dopo Show HN) | solo dopo un lancio con trazione |
+
+**Stampa Linux/GNOME** (dove Newelle e Alpaca hanno avuto copertura; nessun competitor Tauri/Electron ci è arrivato): Phoronix (4 articoli su Newelle, si attiva con release con nome), OMG! Ubuntu (tag Newelle), MakeTechEasier, Ubuntu Handbook, FOSS Force ("Linux App of the Week"), LinuxLinks ("Machine Learning in Linux", Reor), AlternativeTo News, This Week in GNOME (§5.5).
+
+**Social:** su X [@DataChaz](https://x.com/DataChaz/status/2048333579751702853) e [@Sumanth_077](https://x.com/Sumanth_077/status/2054566469036613811) hanno spinto Tolaria con la formula "Karpathy's LLM wiki just became a real app"; su TikTok [@github.awesome](https://www.tiktok.com/@github.awesome/video/7632867290555419918) presenta repository GitHub. Da contattare in DM dal proprio account.
+
+**Comunità:** r/LLM_Wiki (linkato dal badge di awesome-llm-wiki), [TiddlyWiki forum](https://talk.tiddlywiki.org/t/riding-the-wave-of-andrej-karpathys-llm-wiki/15214), Hacker News (§4, un solo Show HN utile per progetto).
+
+### 8.3 Ricerche senza risultati (non ripetere)
+
+Al 14 ottobre 2026 queste ricerche non hanno trovato copertura dei competitor; sono spazi liberi, ma senza un pubblico già agganciato alla categoria:
+
+- XDA, MakeUseOf, How-To Geek, It's FOSS, Linuxiac, 9to5Linux, GamingOnLinux: nessun articolo su Tolaria, nashsu, OpenKnowledge, Newelle o Alpaca.
+- Zenn, Qiita (JP): nessun articolo su nashsu/llm_wiki.
+- 少数派, 掘金, CSDN, 知乎 (CN): nessun articolo trovato via ricerca web (le ricerche interne ai siti non sono state fatte).
+- GeekNews / news.hada.io (KR): nessun post sulle app LLM Wiki.
+- console.dev, TLDR: nessuna menzione.
+- HackerNoon, Analytics Vidhya, MarkTechPost: nessuna menzione di OpenKnowledge.
+- YouTube: nessuna recensione video trovata via ricerca web.
+- Product Hunt: irrilevante per Tolaria (29 upvote, §3.3); per OpenKnowledge le cifre "#1" sono di seconda mano.
+- goodfirstissue.dev (DeepSource): richiede almeno 10 contributori; gknowledge ne ha 3. Riprovare più avanti.
+- Liste awesome regionali (awesome-indonesia-repo, awesome-brasil, awesome-vietnamese, liste Africa): accettano solo progetti di autori locali.
+- OSCA (Open Source Community Africa): la lista awesome-open-source non ha merge da gennaio 2024; nessun processo di showcase.
+- EndoTheDev/Awesome-Ollama, rafska/awesome-local-llm: nessun merge recente, decine o centinaia di PR in coda. vince-lam/awesome-local-llms è generato da uno scraper.
+- firstcontributions (/contribute-to-opensource): ultima aggiunta gennaio 2026, bassa priorità.
+- Liste awesome-hacktoberfest (verificate il 15 ottobre 2026): OtacilioN/awesome-hacktoberfest (862★) non ha merge da ottobre 2023 e ha 23 PR in coda; mattjegan/awesome-hacktoberfest (133★) non aggiunge progetti da ottobre 2024; Piyushhbhutoria/awesome-hacktoberfest-2026 (62★) ha fatto l'ultimo merge a novembre 2025, ha poco pubblico ed è l'unica tentata (PR #22, §8.1). Dato che Hacktoberfest 2026 non conta più le PR (§8.4), le etichette `hacktoberfest`, `hacktoberfest-accepted` e `spam` non servono.
+- Newsletter in spagnolo, indonesiano, vietnamita o hindi che accettino segnalazioni via issue GitHub: nessuna trovata.
+- Masakhane, Zindi, Deep Learning Indaba, Data Science Nigeria: comunità di ricerca ML o competizioni, fuori tema per un'app desktop.
+
+### 8.4 Africa e paesi emergenti (14 ottobre 2026)
+
+Il messaggio per questo pubblico è **offline, senza API a pagamento, su un portatile Linux qualunque**, non Karpathy o MCP. Fatti e azioni:
+
+- **Hacktoberfest 2026 non conta più le PR** ([FAQ](https://hacktoberfest.com/questions/): "Pull requests and merge requests will no longer count toward Hacktoberfest rewards"). Il topic `hacktoberfest` non porta traffico, quindi non è stato aggiunto. Il tema 2026 è l'AI open source e i modelli open-weight; le sfide DEV HF26 richiedono un progetto nuovo costruito nella settimana della sfida, quindi gknowledge non è idoneo.
+- **Hack Day locali**: l'[API MLH](https://hacktoberfest-api.mlh.com/api/events) elenca 80 eventi futuri nelle aree target (Nigeria, Kenya, Uganda, Pakistan, Bangladesh, Brasile, Messico e altre). La lista breve e il messaggio agli organizzatori sono in `emerging.md`.
+- **README tradotti**: francese (Africa francofona), portoghese brasiliano e spagnolo, con una sezione "pensato per funzionare senza connessione". Issue #32–#40 (`good first issue`, `translation`) chiedono a madrelingua swahili, hausa, yoruba, amarico, arabo, hindi, indonesiano, bengali e vietnamita.
+- **Topic GitHub**: rimossi `llmwiki` (duplicato), `git-versioning` e `rest-api`; aggiunti `offline-first`, `local-first` e `gtk4`.
+- **Canali manuali verificati**: TabNews (BR; post sul proprio progetto ammessi se utili, `Pitch` nel titolo), r/developersIndia (solo thread Showcase mensile, secondo domenica), Viblo (VN; vieta pubblicità e post sotto 1.000 caratteri, serve un tutorial), Techpoint Africa (form di segnalazione). r/brdev rimuove i link a progetti propri: usare TabNews.
+
+
+### 8.5 Caso di studio: getkern/kern (15 ottobre 2026)
+
+[kern](https://github.com/getkern/kern) (runtime di container Rust per agenti, creato il 18 lug 2026, 442★ il 15 ott) è un progetto di un solo maintainer italiano partito da zero. Le stelle per giorno non sono leggibili dall'API (404 sugli stargazer), quindi la curva è ricostruita da snapshot Wayback, fork e directory.
+
+- **Circa l'85% delle stelle viene da un solo Show HN** ([item 49423927](https://news.ycombinator.com/item?id=49423927), lun 24 ago 2026, 18:24 UTC, 70 punti, #18 in prima pagina): 3 → 67★ in 3 ore, 374★ dopo 10 giorni ([Wayback 3 set](https://web.archive.org/web/20260903104858/https://github.com/getkern/kern)). Titolo nello schema "Nome – categoria in <numero concreto>, no <dolore>"; link diretto al repo; account HN creato 25 giorni prima e scaldato con 3–4 commenti tecnici su Show HN affini; risposte a ogni commento con misure.
+- **L'amplificazione dopo la prima pagina è stata automatica**: [TLDR Dev del 25 ago](https://github.com/GaloisField2718/tldr_news/blob/main/TLDR%20Dev/article_25-08-2026.md), Kitploit, una quindicina di bot di digest HN in cinese e giapponese, zeli.app, AlternativeTo ed EveryDev aggiunti da terzi. Il maintainer non ha inviato nulla di tutto ciò.
+- **Senza effetto misurabile**: 14 release e ~650 commit a settembre (+68★ in 6 settimane), un secondo Show HN (4 punti) e uno morto, due post di blog nel repo mai sindacati, una issue tecnica su LangChain. Nessuna traccia su Lobsters, This Week in Rust, dev.to, Product Hunt, YouTube; X, Reddit e LinkedIn non verificabili.
+- **README costruito per essere verificato su HN**: numeri nel titolo, GIF demo, tabella di confronto con Docker/Podman, sezione "limiti", CI che mantiene veri i numeri pubblicati, pochi badge.
+
+**Conseguenze per gknowledge:** il passo che conta è un solo Show HN preparato bene, non altre directory. Prima del post: README con GIF reale, tabella di misure riproducibili (dimensione, tempo di ingestione offline per N pagine, RAM, zero chiamate di rete), sezione "limiti", confronto con nashsu, Tolaria, Reor e OpenKnowledge, badge ridotti a circa 6, homepage del repo diversa da `console.openapi.com`. Nelle due settimane prima: 3–5 commenti veri su thread HN di LLM wiki o LLM locali. Il giorno: lun–mer 14–15 UTC, link al repo, primo commento "perché l'ho fatto" senza link, presenza per 6 ore. Non copiare: Show HN ripetuti, la cadenza di release come leva per le stelle, storia dei commit riscritta.
+
+**Decisione (15 ottobre 2026):** nessuna azione derivata da questo studio. Il successo di kern su Hacker News è documentato, ma l'effetto sul lungo periodo non è noto: 442★ dopo meno di tre mesi non dicono se la crescita durerà, né se il solo Show HN basti senza una presenza continua. Il README di gknowledge **non va modificato** per adattarlo a HN (niente tabella di misure, sezione limiti, riduzione dei badge). Le considerazioni sopra restano come riferimento; rivalutare osservando le stelle di kern nei prossimi mesi (`gh api repos/getkern/kern -q .stargazers_count`, 442 il 15 ott 2026).
+
+## 9. Studio: le prime 100 stelle senza rivoluzionare README e progetto (15 ottobre 2026)
+
+> Vincolo deciso dall'utente: niente riscrittura del README né modifiche al prodotto per inseguire un canale (§8.5). Solo espedienti legittimi. Nessuna azione è stata eseguita: questa sezione è il piano.
+
+### 9.1 Punto di partenza
+
+- **15 stelle, di cui 13 di colleghi** messe il 23–24 settembre, più 2 dei maintainer delle liste awesome il 14 ottobre. La rete interna è esaurita.
+- **Il collo di bottiglia è il traffico, non la conversione**: 56 visite e 10 visitatori unici in 14 giorni; referrer github.com (4) e news.ycombinator.com (2, nessun post HN su gknowledge trovato). 0 watcher, quindi le release non notificano nessuno. 35 download delle release in totale.
+- **Canali propri non usati**: gknowledge non è tra i 6 repo fissati sul profilo dell'org (86 follower), né sul profilo di francescobianco (217 follower); il README del profilo dell'org non lo cita; blog openapi.com, YouTube, LinkedIn, Instagram e Facebook dell'azienda non ne hanno mai parlato. I repo fratelli portano poco: openapi-skills 60 unici in 14 giorni, openapi-python-sdk 36, openapi-cli 22, mcp-server 15.
+- **Homepage del repo** = `console.openapi.com`: nelle anteprime di HN e Reddit è un link fuorviante. È un'impostazione del repo, non del README.
+- `gknowledge-mcp` non è su PyPI né nel registro MCP.
+
+### 9.2 Cosa dicono i dati
+
+- **GitHub Trending Python (giornaliero)**, letto il 15 ott alle 08:40 UTC: l'ultimo progetto in lista aveva **16 stelle nel giorno**; la soglia pratica è circa **20–40 stelle in 24 ore**. Non esiste un trending per topic. Entrare in trending attiva gli aggregatori automatici di §8.2.
+- **Hacker News**: su 138 lanci di repo AI/LLM nel 2024–25 ([Kraishan 2025](https://arxiv.org/abs/2511.04453)) la mediana è circa **+40 stelle in 24 ore e +85 in 7 giorni**, ma i repo partivano in media da 1.247 stelle. L'etichetta "Show HN" non dà vantaggi (p = 0,39). L'orario migliore è incerto: il testo dello studio indica 12–17 UTC, il grafico mostra il contrario (06–11 UTC). [Borges & Valente 2019](https://arxiv.org/pdf/1908.04219): mediana da 74 a 138 stelle nei 3 giorni attorno a un post HN riuscito. [BookStack](http://www.bookstackapp.com/blog/9000-stars-and-the-effects-of-hacker-news/): 13.000 visitatori nel giorno HN contro ~700.
+- **Reddit**: un progetto Terraform ha preso ~50 stelle da tre subreddit ([dev.to](https://dev.to/adinhodovic/github-s-awesome-repository-traffic-analytics-3hpd)); Infisical lo chiama uno dei canali principali, senza numeri. Serve karma pregresso.
+- **Canali aziendali**: nessuno studio con dati di referrer. Il pubblico di openapi (acquirenti B2B italiani di API) è lontano da quello di gknowledge: aspettarsi poco, ma il costo è basso.
+
+### 9.3 Cosa non fare (GitHub Acceptable Use Policies §4, linee guida HN e Reddit)
+
+- Comprare stelle, scambi "star-for-star", bot, account falsi: vietati come "coordinated inauthentic activity", "rank abuse" e "secondary markets" ([AUP](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies)).
+- Giveaway o premi in cambio di una stella: vietati dalla stessa policy (engagement incentivato).
+- **Campagne interne "mettete una stella"**: lo [studio sulle stelle false](https://arxiv.org/html/2412.13459v1) (CMU, NCSU, Socket: 4,5 milioni di stelle sospette) rileva proprio le stelle "in lockstep", molti account nella stessa finestra breve. Le 13 stelle del 23–24 settembre hanno già quella forma: non ripeterla. Un collega che usa l'app e la stella da solo va bene.
+- Chiedere voti su HN o Reddit, ripostare lo stesso testo in più subreddit.
+
+### 9.4 Regole dei canali verificate
+
+- **r/LocalLLaMA**: autopromozione al massimo 1 post su 10, affiliazione dichiarata, karma minimo, testo scritto da LLM solo se dichiarato.
+- **r/selfhosted**: progetti con meno di 3 mesi solo il venerdì ("New Project Friday").
+- **r/ObsidianMD e forum Obsidian**: il codice di condotta vieta l'autopromozione esclusiva; i post "Share & showcase" su LLM wiki hanno avuto 0 risposte. Meglio rispondere, dichiarandosi, al thread esistente su "automated inter-note linking… using GPT or other LLMs".
+- **Lobsters**: solo su invito, autopromozione ≤25%. Bassa priorità.
+- **Registro MCP ufficiale**: pacchetto PyPI la cui descrizione contiene `mcp-name: io.github.openapi/gknowledge` (anche in un commento HTML), più `server.json` e `mcp-publisher`. `pyproject.toml` può puntare a un `README.pypi.md` separato: il README principale resta intatto.
+- **Glama**: i repo di organizzazioni rivendicano la scheda con un `glama.json` nella radice. **punkpeye/awesome-mcp-servers**: PR, sezione "🧠 Knowledge & Memory". PulseMCP importa dal registro (non verificato).
+
+### 9.5 Piano in 6–8 settimane
+
+| # | Azione | Chi | Sforzo | Stelle attese | Base |
+|---|---|---|---|---|---|
+| 1 | Show HN (testo pronto in `docs/launch/README.md`), settimana 3, poi 6 ore nel thread | utente | M | 0–80 (mediana 30–40) | Kraishan; kern +64 in 3 ore; varianza alta |
+| 2 | Reddit in sequenza con testi diversi e affiliazione dichiarata: r/LocalLLaMA, r/ObsidianMD, r/selfhosted (venerdì), poi r/gnome e r/linux | utente | M | 10–40 | Terraform ~50 da 3 subreddit; serve karma |
+| 3 | Concentrare 1, 2, 4 e 5 in 48 ore (mar–mer) per entrare nel trending Python | utente | tempi | +10–50 se riesce | soglia 16–40 stelle/giorno |
+| 4 | Canali aziendali: articolo sul blog openapi.com (canonical a dev.to), post LinkedIn aziendale con condivisioni dei colleghi con parole proprie (non "mettete una stella"), demo YouTube di 2 minuti | utente | M | 5–15 | nessun dato pubblicato; pubblico lontano |
+| 5 | Thread X/Mastodon/Bluesky e DM a @DataChaz e @Sumanth_077 | utente | L | 2–20 | crescita di Tolaria su X (§8.2) |
+| 6 | Item TWIG e segnalazione a Phoronix e OMG! Ubuntu con la v0.3 | utente | L | 3–10 | Newelle e Alpaca coperti lì |
+| 7 | Pacchetto MCP: `gknowledge-mcp` su PyPI con README PyPI separato, `server.json`, registro, `glama.json`, PR ad awesome-mcp-servers (issue #22) | noi, pubblicazione con credenziali utente | M | 2–8 | regole verificate; da controllare che giri senza GTK |
+| 8 | Outreach già pronta: Menon, Theo James, PyCoder's (§8.1) | utente | L | 0–10 | una newsletter può portarne decine, spesso zero |
+| 9 | Fissare gknowledge sul profilo dell'org (al posto di un SDK) e sul profilo personale; una riga nel README del profilo dell'org | utente (pin), noi (PR al README dell'org) | XS | 1–4 | 86 + 217 follower |
+| 10 | Link incrociati dai README di openapi-skills, openapi-python-sdk e mcp-server | noi | XS | 1–3 | 133 unici in 14 giorni in totale |
+| 11 | Topic: sostituire api-marketplace, certified-api, openapi, openclaw con gnome, libadwaita, karpathy, ollama, mcp-server, obsidian | noi | XS | 0–3 | evidenza debole |
+| 12 | Risposte dichiarate in thread esistenti (forum Obsidian, r/LocalLLaMA, HN) | utente | L, continuo | 1–5 | i post showcase lì hanno 0 risposte |
+| 13 | Attivare Discussions, annunciarvi le release, chiedere ai primi utenti di seguire il repo (Watch) | noi | XS | 0–2 | trattiene i visitatori, non ne porta |
+| — | Homepage del repo verso la pagina delle release o di installazione | noi | XS | — | evita un link fuorviante nelle anteprime |
+
+**Stato al 16 ottobre 2026.** Fatti: 11 (topic: tolti api-marketplace, certified-api, openapi, openclaw, ai, claude-skills; aggiunti gnome, libadwaita, karpathy, ollama, mcp-server, obsidian; limite di 20) e homepage (ora `openapi.github.io/gknowledge`). Il 7 è in [PR #41](https://github.com/openapi/gknowledge/pull/41) (merged; pacchetto e registro pubblicati il 16 ott): pacchetto separato `gknowledge-mcp` (solo core e server, senza GTK, con `--init`), `server.json`, `glama.json` e workflow `mcp.yml`. Dopo il merge servono il trusted publisher su PyPI e l'environment `pypi`; poi la PR ad awesome-mcp-servers. Da fare: 9, 10, 13.
+
+**Sequenza.** Settimane 1–2: preparazione (7, 9, 10, 11, 13 e homepage da parte nostra; pin, outreach pronta, karma Reddit, 3–5 commenti HN veri e il video da parte dell'utente). Settimana 3: tutto il lancio in 48 ore (Show HN, social, LinkedIn e blog il primo giorno; r/LocalLLaMA e r/ObsidianMD il secondo; r/selfhosted il venerdì), obiettivo 30+ stelle in 24 ore. Settimane 4–5: v0.3 con una funzione dal nome riconoscibile, TWIG, Phoronix, r/gnome, r/linux. Settimane 6–8: risposte nei thread, Medium, thread Showcase di r/developersIndia dell'8 novembre, controllo delle PR aperte.
+
+**Stima.** Con tutto il piano, la somma dei valori centrali è circa **+80–110 stelle**. Senza Show HN scende a **+45–70**: le 100 in 8 settimane diventano improbabili senza HN o un giorno in trending. L'alternativa a puntare tutto su HN è la combinazione Reddit + 48 ore concentrate.
+
+**Non conviene:** Lobsters (invito), altre liste awesome piccole, pubblicità, giveaway (vietati).
+
+## 10. Rilancio dopo la v0.3.0 (19 ottobre 2026)
+
+### 10.1 Cosa dicono davvero le statistiche
+
+| Giorno | Clone (unici) | Run di CI | Visite (unici) |
+|---|---|---|---|
+| 12 ott | 2 (2) | — | 1 (1) |
+| 13 ott | 304 (81) | 39 | 42 (6) |
+| 14 ott | 139 (61) | 4 | 11 (3) |
+| 15 ott | 94 (41) | 5 | 9 (4) |
+| 16 ott | 68 (32) | 3 | 46 (19) |
+| 17 ott | 20 (15) | — | 4 (3) |
+| 18 ott | 12 (9) | — | 6 (3) |
+
+Fonti: `gh api repos/openapi/gknowledge/traffic/clones`, `/traffic/views`, `gh run list`.
+
+- **I clone non misurano le persone.** Ogni `actions/checkout` conta come clone, e ogni runner come clone "unico". Il picco del 13 coincide con le 39 run di CI di quel giorno (v0.2.1, v0.2.2, i pacchetti `.deb`, il repository APT e il remote Flatpak); il calo segue la fine dei rilasci, non una perdita di pubblico. A questi si aggiungono mirror e scraper che clonano i repo appena entrano in una lista awesome. Da qui in avanti la metrica di riferimento sono **visite uniche e stelle**, non i clone.
+- **Il traffico umano è sempre stato basso**: 3–6 visitatori unici al giorno, con due picchi, il 13 (articolo dev.to) e il 16 (pubblicazione su PyPI e sul registro MCP, 19 unici). Referrer in 14 giorni: github.com 8 unici, alternativeto.net 3, Google 2, news.ycombinator.com 2.
+- **Stelle: 19** (15 al 15 ott). Le 4 nuove arrivano dalle liste awesome e dall'articolo dev.to (justinf555 il 17 ott è con ogni probabilità Justin di dev.to, che ha detto di aver messo la stella). Il primo contributo esterno di AdityaWagh06 (#1, #19) arriva da up-for-grabs o awesome-for-beginners.
+- **Nessuna delle candidature in attesa si è mossa**: awesome-for-beginners #2143, awesome-hacktoberfest-2026 #22, ollama #19001 e awesome-context-engineering #88 sono aperte senza commenti; HelloGitHub #3956, ruanyf #12333 e OpenGithubs #33 non hanno risposte. awesome-mcp-servers #16968 e #16969 hanno l'etichetta `missing-glama`: il bot chiede la scheda su Glama e il badge di punteggio nella riga.
+- **Il §9.5 si è fermato alla preparazione**: fatti topic, homepage e pacchetto MCP; nessuna delle azioni "utente" (Show HN, Reddit, social, TWIG, outreach) è partita. Il traffico è finito con l'ultima azione fatta.
+
+### 10.2 Perché adesso
+
+La v0.3.0, uscita oggi, è il primo rilascio con un **Flatpak installabile su qualsiasi distribuzione** (`io.github.openapi.Gknowledge`, remote su Pages) e una funzione con un nome riconoscibile ("pagine che invecchiano quando la fonte cambia"). È esattamente il gancio che §6 (Fase 2) e §9.5 (azione 6) aspettavano per TWIG e Phoronix, e toglie l'obiezione "solo Ubuntu" dallo Show HN.
+
+### 10.3 Sequenza
+
+Calendario: TWIG esce il venerdì, gli item vanno inviati entro giovedì. Lo Show HN resta uno solo (§8.5, §9.4) e va fatto con l'app installabile ovunque.
+
+| Quando | Azione | Chi | Testo |
+|---|---|---|---|
+| lun 19 – mar 20 ott | Rispondere a Justin su dev.to: Flatpak uscito, riga `flatpak install`, chiedergli di provarlo su Fedora (piano in §8.1) | utente | da scrivere insieme |
+| lun 19 – mar 20 ott | Scheda su Glama per `openapi/gknowledge` (il `glama.json` c'è già), poi badge nelle PR #16968 e #16969 | utente (login Glama), noi (badge) | — |
+| mer 21 ott | Discussions attive, annuncio della 0.3.0 lì (§9.5 azione 13); link incrociati dai README di openapi-skills, openapi-python-sdk e mcp-server (azione 10) | noi | — |
+| entro gio 22 ott | **Item TWIG** per la 0.3.0 nella stanza Matrix `#thisweek:gnome.org` | utente | `docs/launch/README.md` |
+| gio 22 – ven 23 ott | Segnalazione a Phoronix e OMG! Ubuntu; articolo di aggiornamento su dev.to ("0.3: now on any distro via Flatpak, and pages that know when their source changed") | utente | `docs/launch/README.md` |
+| settimana del 19 | 3–5 commenti veri su thread HN di LLM wiki o LLM locali; karma Reddit | utente | — |
+| ~~mar 27 o mer 28 ott~~ | ~~Show HN~~: sostituito dal post HN del 19 ott (§10.4). Thread X/Mastodon e post LinkedIn aziendale restano, in un giorno a scelta | utente | `docs/launch/README.md` (aggiornato alla 0.3) |
+| giorno dopo | r/LocalLLaMA e r/ObsidianMD, testi diversi | utente | `docs/launch/README.md` |
+| ven 30 ott | r/selfhosted (New Project Friday) | utente | — |
+| inizio novembre | r/gnome, r/linux; outreach Menon, Theo James, PyCoder's (§8.1); Showcase di r/developersIndia l'8 nov | utente | `outreach.md`, `emerging.md` |
+
+Obiettivo originale: 30+ stelle nelle 24 ore dello Show HN, per entrare nel trending Python (§9.2). Dopo il §10.4 il peso passa a TWIG, Phoronix/OMG! Ubuntu e Reddit. Criterio di verifica: visite uniche e stelle, non clone.
+
+**Stato al 19 ottobre 2026 (sera).**
+
+- Risposta a Justin su dev.to: fatta dall'utente.
+- Annuncio della 0.3 nelle Discussions dell'org, categoria Open Source AI: [#72](https://github.com/orgs/openapi/discussions/72), accanto a quello della 0.2 (#71). Al posto di attivare le Discussions sul repo si usano quelle dell'org: il ticker Pulse le linka da ogni README dell'org, e un secondo spazio dividerebbe una comunità ancora piccola.
+- Link incrociati (azione 10): una riga in openapi-skills e openapi-python-sdk (sezione "Related projects"), in mcp-server ("Useful Resources") e nel README del profilo dell'org. Le PR vanno aperte dall'utente: il classificatore di auto mode blocca le scritture su altri repository.
+- Glama: scheda ancora assente (404 su `glama.ai/mcp/servers/openapi/gknowledge`); serve il login dell'utente.
+
+**Stato al 27 ottobre 2026.**
+
+- **Glama.** `openapi/mcp-server` risulta rivendicato dall'account dell'utente e ha voto B: il badge già presente nella riga della #16968 si risolve, punkpeye ringraziato. `openapi/gknowledge` inviato con nome e descrizione da app ed è stato **rifiutato**: per il revisore descriveva un'app GNOME e non un server MCP, e cita la descrizione del repo ("native GNOME knowledge workstation"). Reinviato come `gknowledge-mcp`, con descrizione che parte da "Stdio MCP server" ed elenca i tool: rifiutato perché "MCP server already exists for this repository". Infatti la scheda `openapi/gknowledge` esiste e ha voto A, nonostante l'email di rifiuto del primo invio. Badge aggiunto nella riga della #16969, punkpeye ringraziato. Le email di Glama non vanno prese alla lettera: verificare il badge (`<title>` dell'SVG).
+- **Lezione per le directory MCP**: presentare gknowledge come `gknowledge-mcp` con i tool in prima riga, non come app; la descrizione del repo su GitHub pesa nella revisione.
+- **awesome-context-engineering #88**: mergiata il 24 ott; ringraziato yzfly con invito a seguire l'org.
+- **Justin**: Flatpak verificato su Fedora 44 (primo test esterno fuori da Ubuntu); CONTRIBUTING linka tutta la sua serie. L'utente gli ha risposto il 27 ott proponendo la base di conoscenza demo.
+
+### 10.4 Il post su Hacker News del 19 ottobre
+
+Il 19 ottobre alle 14:36 UTC l'utente ha pubblicato su HN [*The Second Brain Gnome Users Deserve. Go Ahead, HN. Flag This OpenSourceProject*](https://news.ycombinator.com/item?id=50153030), con link all'annuncio [#72](https://github.com/orgs/openapi/discussions/72) e non al repo, senza prefisso "Show HN". Alla pubblicazione: primo su /newest, visibile anche senza login, 1 punto, 0 commenti.
+
+- **Contesto dell'account** (`hacker-news.firebaseio.com/v0/user/francescobianco`): karma 8; i post del 3, 4, 10 e 13 ottobre e uno del 29 settembre risultano `dead`.
+- **Rischi segnalati e accettati**: titolo che invita al flag, link a una pagina di annuncio invece che al repo, assenza da /show, effetto su un eventuale Show HN successivo. Proposta di cancellarlo finché aveva 0 commenti: **rifiutata**. L'utente accetta di perdere il lancio HN pianificato e sta preparando un repository separato per far crescere il karma dell'account.
+- **Conseguenza per il piano**: lo Show HN del 27/28 ottobre esce dalla sequenza di §10.3. HN resta un canale dell'utente, gestito alle sue condizioni; non va più riproposto nei piani.
+- **Da osservare**: punti, commenti e stato `dead` o `flagged` dell'item 50153030; referrer `news.ycombinator.com` nel traffico del repo e della discussione #72.
+- **Esito al 27 ottobre**: 2 punti, 0 commenti, item `dead`. Nel traffico del repo, 2 visitatori unici da news.ycombinator.com in 14 giorni.
+
+### 10.5 Giro sull'engagement (27 ottobre 2026)
+
+**I numeri.** Fonti: `gh api repos/openapi/gknowledge`, `/traffic/views`, `/traffic/popular/referrers`, stargazers con `starred_at`.
+
+- **Stelle: 24** (19 il 19 ott). Le 5 nuove: passasooz, evanjrowley e robertogallea il 19, simonetravaglini e AdityaWagh06 il 20, justinf555 il 21. Watcher: 0. Fork: 6.
+- **Visite uniche al giorno**: 15 il 19 ott (0.3.0, post HN, LinkedIn), 10 il 20, 5 il 21, poi 0–4 dal 22. Dal 21 ott non è partita nessuna azione verso l'esterno, e il traffico segue le azioni, come già visto in §10.1.
+- **Referrer in 14 giorni (unici)**: LinkedIn **14** (10 dal web e 4 dall'app Android), github.com 10, alternativeto.net 4, Google 3, news.ycombinator.com 2, DuckDuckGo 1, up-for-grabs.net 1. **LinkedIn è il primo canale esterno** ed è l'unico tra quelli dell'utente che ha portato persone; HN, che pesava di più nel piano, ne ha portate 2.
+- **Rimasti indietro dal §10.3**: nessun item TWIG (0 menzioni nel feed di thisweek.gnome.org), nessuna segnalazione a Phoronix e OMG! Ubuntu, nessun articolo di aggiornamento su dev.to (l'ultimo è quello del 13 ott: 6 reazioni, 2 commenti), nessun post Reddit.
+- **Candidature ferme**: awesome-for-beginners #2143 e ollama #19001 (dal 14 ott), awesome-hacktoberfest-2026 #22 (dal 15), HelloGitHub #3956, ruanyf #12333 e OpenGithubs #33 (dal 13): nessun commento. awesome-mcp-servers #16968 e #16969: ora `has-glama`, in attesa di merge.
+
+**Azioni, in ordine di resa attesa.**
+
+| # | Azione | Chi | Perché |
+|---|---|---|---|
+| 1 | **PR #46 di AdityaWagh06** (rilevamento di Ollama locale nelle preferenze, +468/−9): aperta il 20 ott e mai commentata da un umano; la CI è ferma su `action_required` perché va approvata per i fork. Approvare la CI, rivedere e rispondere entro oggi, ringraziando | utente (approvazione), noi (revisione) | è il suo terzo contributo (#1, #19). Un contributore che torna vale più di qualsiasi lista, e sette giorni di silenzio sono il modo più rapido per perderlo |
+| 2 | **LinkedIn di nuovo**: post per la 0.3 (Flatpak su qualsiasi distro, testato su Fedora 44 da un utente esterno, server MCP con voto A su Glama) dal profilo personale e da quello aziendale; i colleghi lo condividono con parole proprie | utente | primo referrer esterno: 14 visitatori unici in 14 giorni, più di HN, Google e AlternativeTo messi insieme |
+| 3 | **Item TWIG** entro giovedì 29 ott per l'uscita di venerdì 30, testo in `docs/launch/README.md`; nello stesso giorno, segnalazione a Phoronix e OMG! Ubuntu | utente | era il gancio della 0.3 (§10.2) e non è ancora stato usato; il Flatpak è ora verificato anche su Fedora |
+| 4 | **Demo con la serie di Justin**, se accetta: compilare *Building GNOME Apps with Rust* in un wiki gknowledge, poi l'articolo di aggiornamento su dev.to ("I compiled a GNOME dev series into a wiki my agents can cite"), mostrato prima a lui | noi (demo), utente (articolo) | trasforma un rapporto già caldo in contenuto con due pubblici; lui ha una ragione per condividerlo |
+| 5 | **r/selfhosted** venerdì 30 ott (New Project Friday), affiliazione dichiarata; r/LocalLLaMA e r/ObsidianMD nei giorni dopo, con testi diversi | utente | in sospeso dal §10.3; serve karma Reddit |
+| 6 | **Commenti tecnici sugli articoli GTK4 di Justin** (0–1 reazioni ciascuno), senza link al progetto | utente | reciprocità: il suo pubblico è quello di gknowledge |
+| 7 | **Hacktoberfest finisce il 31 ott**: dopo, la #22 di awesome-hacktoberfest-2026 perde valore. Nessun sollecito; le issue di traduzione (#34–#40) restano `good first issue` per awesome-for-beginners e up-for-grabs | — | non vale un sollecito a un maintainer inattivo da novembre 2025 |
+| 8 | **Un solo sollecito gentile** su awesome-for-beginners #2143 dopo tre settimane (4 nov), se resta ferma | noi | lista da 90k★ con pubblico in India e Africa, coerente con le traduzioni aperte |
+| 9 | **Issue su Karpathy-LLM-Wiki-Stack** che proponga la riga di gknowledge, descritta per meccanismo | noi | la #2 è stata mergiata senza di noi |
+
+**Aggiornamento della sera (27 ott).**
+
+- **#2 LinkedIn**: post per la 0.3 pubblicato. Verificare l'effetto sui referrer il 3 novembre.
+- **#3 stampa**: suggerimenti inviati via email a OMG! Ubuntu e Phoronix con il testo della PR #49, **senza screenshot di proposito**: gli screenshot saranno il motivo di un secondo contatto verso il 26 novembre. **TWIG è rinviato** finché gknowledge non è su Flathub (TWIG vuole app su piattaforme affermate e non accetta note scritte da LLM).
+- **#9 Karpathy-LLM-Wiki-Stack**: issue #3 aperta e **accettata** in giornata (riga in §19 con la PR #4, vedi §8.1).
+- **awesome-mcp-servers #16969**: il bot ha confermato il badge, i requisiti di punkpeye sono soddisfatti, la PR è mergeable. Nessun sollecito prima del 3 novembre; l'ultimo giro di merge del maintainer è del 23 ottobre.
+
+**Da non fare.** Chiedere stelle o follow a chi non ha ancora usato l'app; solleciti alle newsletter cinesi (HelloGitHub smaltisce la coda lentamente, un sollecito non la accelera); cambiare il README per un canale (vedi la memoria del progetto); riproporre HN (§10.4).
+
+**Metrica di controllo per il 3 novembre**: visite uniche giornaliere sopra 5 per almeno tre giorni, 30 stelle, risposta sulla #46, merge di #16968 e #16969.

@@ -66,9 +66,10 @@ install_deb() {
     [ "${GKNOWLEDGE_NO_REPO:-}" = 1 ] || warn "The APT repository is not reachable; installing the release .deb (no automatic updates)."
     install_release_deb
   fi
-  if [ -e "$HOME/.local/bin/gknowledge" ] || [ -e "$HOME/.local/share/applications/io.gknowledge.Gknowledge.desktop" ]; then
+  if [ -e "$HOME/.local/bin/gknowledge" ] || [ -e "$HOME/.local/share/applications/io.gknowledge.Gknowledge.desktop" ] \
+     || [ -e "$HOME/.local/share/applications/io.github.openapi.Gknowledge.desktop" ]; then
     warn "An older gknowledge in ~/.local shadows this install (old icon and version)."
-    warn "Remove it with: rm -rf ~/.local/bin/gknowledge ~/.local/bin/gknowledge-mcp ~/.local/share/gknowledge ~/.local/share/applications/io.gknowledge.Gknowledge.desktop ~/.local/share/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg ~/.local/share/metainfo/io.gknowledge.Gknowledge.metainfo.xml && gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor"
+    warn "Remove it with: rm -rf ~/.local/bin/gknowledge ~/.local/bin/gknowledge-mcp ~/.local/share/gknowledge ~/.local/share/applications/io.*Gknowledge.desktop ~/.local/share/icons/hicolor/scalable/apps/io.*Gknowledge.svg ~/.local/share/metainfo/io.*Gknowledge.metainfo.xml && gtk-update-icon-cache -f -t ~/.local/share/icons/hicolor"
   fi
   info "Done. Launch gknowledge from the app grid or run: gknowledge"
 }

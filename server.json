@@ -1,0 +1,37 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.openapi/gknowledge",
+  "title": "gknowledge",
+  "description": "Search, read and grow a Karpathy-style LLM wiki of linked Markdown pages, with cited answers.",
+  "repository": {
+    "url": "https://github.com/openapi/gknowledge",
+    "source": "github"
+  },
+  "websiteUrl": "https://openapi.github.io/gknowledge",
+  "version": "0.3.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "gknowledge-mcp",
+      "version": "0.3.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "--init",
+          "description": "Create the project folder the first time"
+        },
+        {
+          "type": "positional",
+          "valueHint": "project_folder",
+          "description": "Path to the gknowledge project folder (the wiki)",
+          "isRequired": true
+        }
+      ]
+    }
+  ]
+}

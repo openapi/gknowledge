@@ -33,12 +33,13 @@ jobs:
           flatpak install --user -y flathub org.gnome.Platform//51 org.gnome.Sdk//51
       - name: Build and verify Flatpak bundle
         run: |
-          flatpak-builder --user --force-clean --repo=repo build-dir build-aux/flatpak/io.gknowledge.Gknowledge.yaml
+          flatpak-builder --user --force-clean --repo=repo build-dir build-aux/flatpak/io.github.openapi.Gknowledge.yaml
           bundle="gknowledge-${GITHUB_REF_NAME}.flatpak"
-          flatpak build-bundle --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo repo "$bundle" io.gknowledge.Gknowledge
+          flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
+            repo "$bundle" io.github.openapi.Gknowledge
           test -s "$bundle"
           flatpak install --user --noninteractive --bundle "$bundle"
-          flatpak info --user io.gknowledge.Gknowledge
+          flatpak info --user io.github.openapi.Gknowledge
       - uses: softprops/action-gh-release@v2
         with:
           files: gknowledge-*.flatpak

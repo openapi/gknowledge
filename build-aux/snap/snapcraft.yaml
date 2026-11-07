@@ -16,7 +16,7 @@ apps:
   gknowledge:
     command: usr/bin/gknowledge
     extensions: [gnome]
-    desktop: usr/share/applications/io.gknowledge.Gknowledge.desktop
+    desktop: usr/share/applications/io.github.openapi.Gknowledge.desktop
     plugs: [home, network, desktop, wayland, x11, gsettings]
 
 parts:

@@ -1,4 +1,4 @@
-app-id: io.gknowledge.Gknowledge
+app-id: io.github.openapi.Gknowledge
 runtime: org.gnome.Platform
 runtime-version: '51'
 sdk: org.gnome.Sdk
@@ -15,6 +15,17 @@ finish-args:
   # which goes through the document portal inside the sandbox.
 
 modules:
+  # PDF import; pure Python, installed from the wheel without network access.
+  - name: python3-pypdf
+    buildsystem: simple
+    build-commands:
+      - pip3 install --no-index --no-deps --no-build-isolation --find-links="file://${PWD}"
+        --prefix=${FLATPAK_DEST} pypdf
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/3c/2c/c43c03eaf630435f023f1dc61ec4a4a78951ad5530a62c71cc89bde307b7/pypdf-6.19.0-py3-none-any.whl
+        sha256: 7e5d6e730e7dae87d560a2cee218b852f6498c8be61966f3cd02ead971e48d14
+
   - name: gknowledge
     buildsystem: simple
     build-commands:

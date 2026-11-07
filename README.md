@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="data/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg" alt="" width="96">
+  <img src="data/icons/hicolor/scalable/apps/io.github.openapi.Gknowledge.svg" alt="" width="96">
 </p>
 
 <h1 align="center">gknowledge</h1>
 
-<p align="center"><b>English</b> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.it.md">Italiano</a></p>
+<p align="center"><b>English</b> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.it.md">Italiano</a> · <a href="README.fr.md">Français</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a></p>
 
 <p align="center">
   <b>Karpathy's LLM Wiki as a native GNOME app.</b><br>
@@ -33,7 +33,7 @@
   <img alt="Karpathy LLM Wiki pattern" src="https://img.shields.io/badge/pattern-Karpathy%20LLM%20Wiki-f59e0b?style=flat-square">
   <img alt="Sign in with ChatGPT" src="https://img.shields.io/badge/Sign%20in%20with-ChatGPT-10a37f?style=flat-square&logo=openai&logoColor=white">
   <img alt="Ollama" src="https://img.shields.io/badge/Ollama-supported-000000?style=flat-square">
-  <img alt="Flatpak planned" src="https://img.shields.io/badge/Flatpak-planned-4a86cf?style=flat-square&logo=flatpak&logoColor=white">
+  <img alt="Flatpak" src="https://img.shields.io/badge/Flatpak-available-4a86cf?style=flat-square&logo=flatpak&logoColor=white">
   <img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-ff69b4?style=flat-square">
 </p>
 
@@ -65,12 +65,12 @@ sudo apt update && sudo apt install gknowledge
 **On any distribution, with Flatpak** (the GNOME runtime comes from Flathub):
 
 ```bash
-flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref
+flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref
 ```
 
 Both repositories are described at [openapi.github.io/gknowledge](https://openapi.github.io/gknowledge).
 
-Then open **gknowledge** from the app grid. To remove it: `sudo apt remove gknowledge` (or `flatpak uninstall io.gknowledge.Gknowledge`).
+Then open **gknowledge** from the app grid. To remove it: `sudo apt remove gknowledge` (or `flatpak uninstall io.github.openapi.Gknowledge`).
 
 <details>
 <summary>Other distributions, from source, and release builds</summary>
@@ -179,7 +179,7 @@ Nothing is sent anywhere unless you pick a provider that is not offline.
 | Native GNOME / GTK 4 | **yes** | Tauri | Tauri | Electron | Electron | web + Electron |
 | Works offline, no key | **yes** | needs a model | AI optional | agent-driven | local model | self-host |
 | Plain Markdown vault | **yes** | yes | yes | yes | yes | reads yours |
-| Linux packaging | `.deb`, Flatpak planned | `.deb`, AppImage | AppImage, `.deb` | `.deb`, `.rpm` | AppImage | pip, Docker |
+| Linux packaging | `.deb`, Flatpak | `.deb`, AppImage | AppImage, `.deb` | `.deb`, `.rpm` | AppImage | pip, Docker |
 | License | MIT | GPL-3.0 | AGPL-3.0 | GPL-3.0 | AGPL-3.0 | AGPL-3.0 |
 
 Details and history of each project are in [`DISTRIBUTING.md`](DISTRIBUTING.md).

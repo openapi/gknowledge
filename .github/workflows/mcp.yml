@@ -1,0 +1,37 @@
+name: MCP package
+# Publishes gknowledge-mcp to PyPI (trusted publishing, environment "pypi")
+# and server.json to the official MCP registry (GitHub OIDC).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: build-aux/pypi/build.sh dist/pypi
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/pypi
+          skip-existing: true
+      # server.json always follows the version in gknowledge/__init__.py.
+      - run: |
+          version=$(python3 -c 'import re; print(re.search(r"__version__ = \"(.+)\"", open("gknowledge/__init__.py").read())[1])')
+          jq --arg v "$version" '.version = $v | .packages[0].version = $v' server.json > server.tmp
+          mv server.tmp server.json
+      - run: |
+          curl -fsSL https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz | tar xz mcp-publisher
+          ./mcp-publisher login github-oidc
+      # The registry checks the README on PyPI, which can take a minute to appear.
+      - run: |
+          for i in 1 2 3 4 5; do ./mcp-publisher publish && exit 0; sleep 30; done
+          exit 1

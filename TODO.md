@@ -2,6 +2,38 @@
 
 Actionable backlog derived from [`ROADMAP.md`](ROADMAP.md). Ordered by what unblocks the first 100 stars. `[ ]` open, `[x]` done.
 
+## Feedback from dev.to: Flatpak first, drift over hallucination (2026-10-17)
+
+Source: [comment by Justin (@fromthearchitect)](https://dev.to/fromthearchitect/comment/3i4d5) on the launch article. Data/AI architect on Fedora, writing a GNOME photo app in Rust; starred the repo and will try gknowledge "once a Flatpak is available". Follow-up is tracked in `DISTRIBUTING.md` §8.1 (dev.to row).
+
+Flatpak (the `.deb` and `install.sh` do nothing for Fedora, Arch or openSUSE users)
+- [x] Flatpak build is green in CI (`appstreamcli compose` succeeds since the GNOME 51 bump); every release attaches a bundle and `repos.yml` publishes the remote at `openapi.github.io/gknowledge` (closes #24).
+- [x] `flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref` works on Ubuntu (2026-10-19): pulls GNOME 51 from Flathub, installs 0.2.2, the app launches.
+- [x] Inside the Flatpak, New Project failed with "disk I/O error" (SQLite WAL needs shared memory the document portal does not provide); the store no longer uses WAL and converts old databases. Project creation, PDF/Markdown import, ingest, query and drift check verified on a portal path (2026-10-19).
+- [x] Inside the Flatpak, by hand: create a project, import through the file chooser, ingest, reopen after a restart (2026-10-19).
+- [x] Verify on a non-Ubuntu distro: Justin installed the Flatpak on Fedora 44 and reported it works, no issues ([comment of 2026-10-27](https://dev.to/fromthearchitect/comment/3iek7)). Still triage first anything he opens as `justinf555`.
+- [x] README: badge and comparison table no longer say "Flatpak planned" (install section left as is).
+- [x] Vendor `pypdf` 6.19.0 in the manifest (the 0.2.2 bundle has `No module named 'pypdf'`, so PDF import fails). Builds green on PR #42.
+- [x] Release 0.3.0, tagged 2026-10-19: `.deb` and `.flatpak` on the release, `gknowledge-mcp` 0.3.0 on PyPI. A fresh install from the Pages flatpakref works, and the old ID's ref carries the end-of-life-rebase to the new one.
+- [x] CI and release Flatpak jobs are blocking (no `continue-on-error`); CI uploads an installable `gknowledge-dev.flatpak` artifact for every PR.
+- [ ] Flathub itself stays paused (AI-assisted code policy, see P0 below); say so plainly if asked, and point to the Pages remote.
+
+Develop against the runtime users get
+- [x] `make start-flatpak`: the `make start` loop run inside `org.gnome.Platform` (version read from the manifest), so host GTK/libadwaita differences show up before release.
+- [x] CONTRIBUTING documents `make start-flatpak`.
+- [x] With Justin's permission ([reply of 2026-10-19](https://dev.to/fromthearchitect/comment/3ia9i)), CONTRIBUTING links his GNOME SDK setup write-up (Part 1 of his GNOME + Rust series); since 2026-10-27 it links the whole series page, now at Part 6.
+
+Drift, not hallucination
+- [x] `core/lint.py`: `ChangeDetector` flags ingested sources whose original file no longer matches the ingested hash, with the pages that cite them.
+- [x] `IngestionManager.refresh_source()`: copy the new version, update hash and size, re-ingest (builds on #30's `reingest_source`).
+- [x] UI: changed sources show "changed since ingest" with a warning icon; the Re-ingest button becomes "Update"; a toast on project open and when the window regains focus.
+- [x] MCP tool `stale_sources` so agents can run the lint step of Karpathy's pattern.
+- [x] Design written up in PR #42, crediting the suggestion; invite Justin to review it when replying.
+- [ ] Mark affected pages as possibly outdated in the Knowledge pane (badge on the page, note in the page header).
+- [ ] Trigger the check from `Gio.FileMonitor` on origin files (#3) instead of only on open and focus.
+- [ ] Sources imported through the document portal: confirm `origin_path` stays readable across sessions inside the Flatpak.
+- [ ] Emit drift as review items once the Review queue is split (#17).
+
 ## UX review with a real ChatGPT plan (2026-10-13)
 
 Test: 6 short AI-paper notes (about 300 words each), provider "ChatGPT plan", model picked automatically (gpt-6.1-sol).
@@ -55,13 +87,13 @@ Speed and feedback
 - [ ] Publish a statement on AI-assisted code (Flathub and GNOME Circle have an AI-code policy since May 2026; this repo is developed with AI assistance and must say so plainly).
 
 ### Flatpak and Flathub (paused: kept warm, do not submit until policy allows AI-assisted code)
-- [ ] Decide the app ID (`io.github.<owner>.Gknowledge` or a verified domain). `io.gknowledge.*` needs a domain we control.
+- [x] App ID is `io.github.openapi.Gknowledge` since 0.3.0 (`io.gknowledge.*` used gknowledge.io, which nobody owns). The Pages remote rebases the old ID with end-of-life-rebase; `.desktop` has `X-Flatpak-RenamedFrom`, MetaInfo has `<replaces>`.
 - [x] Bump the runtime to GNOME 51 (current stable on Flathub). Not yet built in CI.
 - [x] Replace `--filesystem=home` with FileChooser / Documents portals; keep only `--share=network`. Done in the manifest, untested in a real Flatpak build.
-- [ ] Build from `git`/`archive` sources instead of `type: dir`; vendor `pypdf`.
+- [ ] Build from `git`/`archive` sources instead of `type: dir` (`pypdf` vendored).
 - [ ] Complete MetaInfo: screenshots (URLs still missing; developer, urls, branding added), `developer`, `url`, branding colors, release notes, summary of 35 characters or fewer.
 - [ ] Make `flatpak-builder-lint` pass with no exceptions.
-- [ ] Add a `.doap` file. (CI workflows for tests, metadata validation and Flatpak build exist; Flatpak job is non-blocking until proven.)
+- [ ] Add a `.doap` file. (CI workflows for tests, metadata validation and Flatpak build exist; Flatpak job is blocking since 0.3.0.)
 - [ ] Open the `flathub/flathub` submission PR; verify the developer at merge.
 
 ## P0b: GNOME and Ubuntu integration (gedit-style)
@@ -69,7 +101,7 @@ Speed and feedback
 - [x] Keyboard accelerators for new/open/preferences/quit.
 - [x] Desktop entry advertises Markdown, text, PDF and HTML; files passed by the file manager are imported into the current project.
 - [x] About dialog points to the real repository and issue tracker.
-- [ ] GSettings schema (`io.gknowledge.Gknowledge`): window size, maximized, last project, provider; install and compile it in `make install` and the Flatpak.
+- [ ] GSettings schema (`io.github.openapi.Gknowledge`): window size, maximized, last project, provider; install and compile it in `make install` and the Flatpak.
 - [ ] Register projects with `Gtk.RecentManager`.
 - [ ] `Gio.Notification` when ingestion finishes or fails.
 - [ ] Drag and drop of files and folders onto the Sources pane.
@@ -92,7 +124,7 @@ Speed and feedback
 - [ ] "Insights" panel: weakly connected pages, hubs, suggested missing topics.
 
 ### Lint
-- [ ] `core/lint.py`: orphan pages, duplicate titles, missing sources, stale pages, broken `[[links]]`.
+- [ ] `core/lint.py`: orphan pages, duplicate titles, missing sources, broken `[[links]]` (stale sources done, see the dev.to feedback section).
 - [ ] Optional LLM contradiction check.
 - [ ] Emit lint findings as review items.
 - [ ] Append every lint run to `knowledge/log.md` using the parseable `## [date] op | title` prefix.
@@ -165,10 +197,10 @@ Tasks:
 - [x] `build-aux/arch/PKGBUILD` ready for AUR (needs a tag and `updpkgsums`).
 - [x] `build-aux/snap/snapcraft.yaml` draft (untested).
 - [x] First release `v0.1.0` (2026-10-13) with `.deb`, version-independent `gknowledge_all.deb` and `install.sh` (`curl … | bash`).
-- [ ] Fix the Flatpak build: `appstreamcli compose` fails with `file-read-error` on the MetaInfo (the CI job hides it with `continue-on-error`).
+- [x] Fix the Flatpak build: `appstreamcli compose` succeeds in CI since 2026-10-19 (run 39223882741).
 - [ ] Test `sudo apt install ./gknowledge_all.deb` on a clean Ubuntu 24.04 VM.
 - [ ] Publish a signed APT repository on GitHub Pages (reprepro or aptly) and document `curl | gpg --dearmor` setup.
-- [ ] Publish a Flatpak OSTree repo on GitHub Pages with a `.flatpakrepo` file; document `flatpak remote-add`.
+- [x] Publish a Flatpak OSTree repo on GitHub Pages with a `.flatpakrepo` file; document `flatpak remote-add` (README documents the `.flatpakref` install).
 - [ ] Register `gknowledge` on the Snap Store and test the snap on Ubuntu 24.04; decide on `home` plug vs portals.
 - [ ] Create a Launchpad account and PPA; upload a source package (`debian/` with debhelper).
 - [ ] Submit AUR package.
@@ -178,7 +210,7 @@ Tasks:
 
 ## Distribution and community
 
-- [ ] Release workflow exists (`.github/workflows/release.yml`, builds a `.flatpak` bundle on `v*` tags); push the first tag once the Flatpak build is verified.
+- [x] Release workflow exists (`.github/workflows/release.yml`, builds a `.flatpak` bundle on `v*` tags); first verified Flatpak release is v0.3.0.
 - [ ] AUR package (`gknowledge`), ideally maintained by a second person.
 - [ ] Release notes in MetaInfo for every release; monthly cadence at least.
 - [ ] Announce on This Week in GNOME via `#thisweek:gnome.org` the week of the Flathub merge.

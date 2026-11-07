@@ -16,8 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update && sudo apt-get install -y appstream desktop-file-utils
-      - run: appstreamcli validate --no-net data/io.gknowledge.Gknowledge.metainfo.xml
-      - run: desktop-file-validate data/io.gknowledge.Gknowledge.desktop
+      - run: appstreamcli validate --no-net data/io.github.openapi.Gknowledge.metainfo.xml
+      - run: desktop-file-validate data/io.github.openapi.Gknowledge.desktop
   deb:
     runs-on: ubuntu-latest
     steps:
@@ -29,11 +29,19 @@ jobs:
           python3 -c "import gknowledge" 2>/dev/null || PYTHONPATH=/usr/share/gknowledge python3 -c "import gknowledge; print(gknowledge.__version__)"
   flatpak:
     runs-on: ubuntu-latest
-    continue-on-error: true   # promote to required once the build is proven green
     steps:
       - uses: actions/checkout@v4
       - run: |
           sudo apt-get update && sudo apt-get install -y flatpak flatpak-builder
           flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
           flatpak install --user -y flathub org.gnome.Platform//51 org.gnome.Sdk//51
-      - run: flatpak-builder --user --force-clean --repo=repo build-dir build-aux/flatpak/io.gknowledge.Gknowledge.yaml
+      - run: |
+          flatpak-builder --user --force-clean --repo=repo build-dir build-aux/flatpak/io.github.openapi.Gknowledge.yaml
+          flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
+            repo gknowledge-dev.flatpak io.github.openapi.Gknowledge
+      # Installable build of every PR: flatpak install --user gknowledge-dev.flatpak
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gknowledge-flatpak
+          path: gknowledge-dev.flatpak
+          retention-days: 14

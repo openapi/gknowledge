@@ -7,11 +7,11 @@ The source packaging lives in [`build-aux/debian/`](../../build-aux/debian). It 
 ## Build and check it locally
 
 ```sh
-git archive --format=tar.gz --prefix=gknowledge-0.2.2/ v0.2.2 > ../gknowledge_0.2.2.orig.tar.gz
-tar -C .. -xzf ../gknowledge_0.2.2.orig.tar.gz
-cp -r build-aux/debian ../gknowledge-0.2.2/debian
-cd ../gknowledge-0.2.2 && dpkg-buildpackage -us -uc
-lintian -I --pedantic ../gknowledge_0.2.2-1_*.changes
+git archive --format=tar.gz --prefix=gknowledge-0.3.0/ v0.3.0 > ../gknowledge_0.3.0.orig.tar.gz
+tar -C .. -xzf ../gknowledge_0.3.0.orig.tar.gz
+cp -r build-aux/debian ../gknowledge-0.3.0/debian
+cd ../gknowledge-0.3.0 && dpkg-buildpackage -us -uc
+lintian -I --pedantic ../gknowledge_0.3.0-1_*.changes
 ```
 
 On a host without debhelper, run the same steps in a `debian:sid` container with `build-essential devscripts debhelper dh-python python3 python3-pypdf lintian` installed.
@@ -38,7 +38,7 @@ Owner: Francesco Bianco <info.francescobianco@gmail.com>
 X-Debbugs-Cc: debian-devel@lists.debian.org, debian-gtk-gnome@lists.debian.org
 
 * Package name    : gknowledge
-  Version         : 0.2.2
+  Version         : 0.3.0
   Upstream Contact: https://github.com/openapi/gknowledge/issues
 * URL             : https://github.com/openapi/gknowledge
 * License         : Expat (code), CC0-1.0 (AppStream metadata)

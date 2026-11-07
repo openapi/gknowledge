@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>io.gknowledge.Gknowledge</id>
+  <id>io.github.openapi.Gknowledge</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT</project_license>
   <name>gknowledge</name>
@@ -41,13 +41,27 @@
     <control>pointing</control>
     <control>touch</control>
   </supports>
-  <launchable type="desktop-id">io.gknowledge.Gknowledge.desktop</launchable>
+  <launchable type="desktop-id">io.github.openapi.Gknowledge.desktop</launchable>
+  <replaces>
+    <id>io.gknowledge.Gknowledge</id>
+  </replaces>
   <categories>
     <category>Office</category>
     <category>Utility</category>
   </categories>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.3.0" date="2026-10-19">
+      <description>
+        <p>A wiki that knows when it is out of date.</p>
+        <ul>
+          <li>Sources whose original file changed since ingestion are marked, and can be updated in one click</li>
+          <li>Re-ingest or remove a source; knowledge it alone supported is cleaned up</li>
+          <li>PDF import works in the Flatpak</li>
+          <li>Clicking a document in the sidebar opens it</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.2.2" date="2026-10-13">
       <description>
         <p>The app icon shows again in the dock and app grid.</p>

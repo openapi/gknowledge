@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="data/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg" alt="" width="96">
+  <img src="data/icons/hicolor/scalable/apps/io.github.openapi.Gknowledge.svg" alt="" width="96">
 </p>
 
 <h1 align="center">gknowledge</h1>
 
-<p align="center"><a href="README.md">English</a> · <b>简体中文</b> · <a href="README.it.md">Italiano</a></p>
+<p align="center"><a href="README.md">English</a> · <b>简体中文</b> · <a href="README.it.md">Italiano</a> · <a href="README.fr.md">Français</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a></p>
 
 <p align="center">
   <b>Karpathy 的 LLM Wiki，做成原生 GNOME 应用。</b><br>
@@ -42,7 +42,7 @@ sudo apt update && sudo apt install gknowledge
 任意发行版，使用 Flatpak（GNOME 运行时自动从 Flathub 安装）：
 
 ```bash
-flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref
+flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref
 ```
 
 ## 为什么选择 gknowledge

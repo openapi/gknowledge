@@ -8,7 +8,17 @@ Thanks for helping. The project is young, so small, focused contributions are th
 sudo apt install python3-gi gir1.2-gtk-4.0 gir1.2-adw-1   # Debian/Ubuntu
 make test    # headless core tests, no GTK or network needed
 make run     # run from the source tree
+make start   # dev loop on a demo project, restarts on every save
 ```
+
+Flatpak users get the GTK and libadwaita of the GNOME runtime, not yours. Before submitting UI work, run the same dev loop inside that runtime (the version is read from the Flatpak manifest):
+
+```bash
+flatpak install --user flathub org.gnome.Platform//51   # once
+make start-flatpak
+```
+
+New to developing inside the GNOME SDK? Justin's series [Building GNOME Apps with Rust](https://fromthearchitect.dev/series/building-gnome-apps-with-rust/) walks through it, starting from the setup in [Part 1: Getting Started](https://fromthearchitect.dev/posts/gnome-rust-part-1-getting-started/) and then GObject, Blueprint, state and signals; the toolchain differs, the runtime workflow is the same.
 
 ## Ground rules
 

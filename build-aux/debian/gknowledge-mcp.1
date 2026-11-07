@@ -1,8 +1,9 @@
-.TH GKNOWLEDGE-MCP 1 "October 2026" "gknowledge 0.2.2" "User Commands"
+.TH GKNOWLEDGE-MCP 1 "October 2026" "gknowledge 0.3.0" "User Commands"
 .SH NAME
 gknowledge-mcp \- Model Context Protocol server for a gknowledge wiki
 .SH SYNOPSIS
 .B gknowledge-mcp
+.RB [ \-\-init ]
 .I PROJECT
 .SH DESCRIPTION
 .B gknowledge-mcp
@@ -12,6 +13,13 @@ output and offers the tools search_wiki, read_page, list_pages, ask,
 add_source and recent_activity.
 .PP
 It is normally started by the MCP client, not by hand.
+.SH OPTIONS
+.TP
+.B \-\-init
+Create
+.I PROJECT
+if it is not a gknowledge project yet. Without it, the server exits
+when the folder is not a project.
 .SH ARGUMENTS
 .TP
 .I PROJECT

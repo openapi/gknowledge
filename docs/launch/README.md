@@ -42,10 +42,11 @@ This replays the steps that took comparable projects from zero to thousands of s
 > - You can use your own ChatGPT Plus/Pro plan through OpenAI's new "Sign in with ChatGPT" for local apps, so there is no API key and nobody resells tokens. Ollama and any OpenAI-compatible endpoint work too.
 > - It avoids the usual LLM-wiki mess: no empty stub pages, duplicate names are merged, minor names stay mentions until a second source cites them.
 > - It ships an MCP server, so Claude Code or Codex can search and grow the same wiki.
+> - Pages go stale when their source changes, not because the model hallucinates: it flags sources whose original file changed since ingest and lets you update them.
 >
-> Install on Ubuntu/Debian: `curl -fsSL https://github.com/openapi/gknowledge/releases/latest/download/install.sh | bash`
+> Install on any distro with Flatpak: `flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref` (or a one-line `.deb` installer for Ubuntu/Debian).
 >
-> It's early (v0.2). I'd love feedback on the ingestion quality and on what you'd need to switch from Obsidian plus plugins.
+> It's early (v0.3). I'd love feedback on the ingestion quality and on what you'd need to switch from Obsidian plus plugins.
 
 ## X / Mastodon thread
 
@@ -53,7 +54,7 @@ This replays the steps that took comparable projects from zero to thousands of s
 2. No Electron, no Tauri: GTK 4 + Libadwaita. The wiki is a plain folder you can open in Obsidian.
 3. Bring your own brain: your ChatGPT plan via "Sign in with ChatGPT" (no API key), Ollama, or any OpenAI-compatible endpoint.
 4. Agents welcome: `claude mcp add gknowledge -- gknowledge-mcp ~/Knowledge/project`
-5. MIT licensed. One-line install for Ubuntu. ⭐ github.com/openapi/gknowledge
+5. MIT licensed. Flatpak for any distro, one-line install for Ubuntu. ⭐ github.com/openapi/gknowledge
 
 ## Reddit
 
@@ -66,8 +67,75 @@ Each post: one screenshot or the demo, two short paragraphs, the install line, a
 
 ## GNOME channels
 
-- **This Week in GNOME** (Matrix room `#thisweek:gnome.org`): "gknowledge 0.2 is out: a native GTK 4 and Libadwaita app that turns your documents into a linked, cited wiki, offline by default, with optional local or ChatGPT models."
+- **This Week in GNOME** (Matrix room `#thisweek:gnome.org`): "gknowledge 0.3 is out: a native GTK 4 and Libadwaita app that turns your documents into a linked, cited wiki, offline by default, with optional local or ChatGPT models. New in 0.3: a Flatpak for any distribution (`flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref`), PDF import inside the sandbox, and sources that changed since ingest are flagged so the pages built from them can be updated."
 - **Phoronix tip and OMG! Ubuntu tip:** link to the release page, the one-liner, and two screenshots.
+
+## Week of 27 October: texts for the 0.3 push
+
+New facts since the 0.3.0 release, usable everywhere below: the Flatpak was tested on Fedora 44 by an outside user with no issues, and the MCP server is listed on Glama with an A quality score.
+
+### LinkedIn (personal profile, then the Openapi page)
+
+LinkedIn has been the top external referrer (14 unique visitors in 14 days), so this goes first. Colleagues should reshare with a line of their own, not "please star".
+
+**English:**
+
+> gknowledge 0.3 is out, and it now installs on any Linux distribution.
+>
+> It's our open-source take on Andrej Karpathy's "LLM Wiki" idea: instead of re-reading your documents for every question, a model compiles them once into a linked Markdown wiki, keeps track of where each page comes from, and answers with citations.
+>
+> What's new:
+> • A Flatpak that works on any distro (an outside user just confirmed it on Fedora 44)
+> • Pages flag themselves when the source document changes, so the wiki doesn't quietly go stale
+> • An MCP server, rated A on Glama, so Claude Code or Codex can search and grow the same wiki
+>
+> It works offline by default; you can plug in Ollama or your own ChatGPT plan. MIT licensed, built with GTK 4 and Libadwaita.
+>
+> https://github.com/openapi/gknowledge
+
+**Italiano:**
+
+> È uscita gknowledge 0.3, e ora si installa su qualsiasi distribuzione Linux.
+>
+> È la nostra versione open source dell'idea "LLM Wiki" di Andrej Karpathy: invece di rileggere i documenti a ogni domanda, un modello li compila una volta in un wiki Markdown collegato, tiene traccia della fonte di ogni pagina e risponde con le citazioni.
+>
+> Le novità:
+> • un Flatpak che funziona su ogni distro (un utente esterno l'ha appena verificato su Fedora 44)
+> • le pagine si segnalano da sole quando il documento di origine cambia, così il wiki non invecchia in silenzio
+> • un server MCP, con voto A su Glama, per far cercare e ampliare lo stesso wiki a Claude Code o Codex
+>
+> Funziona offline di default; si può collegare Ollama o il proprio piano ChatGPT. Licenza MIT, costruita con GTK 4 e Libadwaita.
+>
+> https://github.com/openapi/gknowledge
+
+### This Week in GNOME (by Thursday for Friday's issue)
+
+Use the text in "GNOME channels" above and add one sentence: "The Flatpak has been tested on Fedora 44 as well as Ubuntu." Attach one screenshot of the main window.
+
+### Phoronix and OMG! Ubuntu tip
+
+> **Subject:** gknowledge 0.3: Karpathy's LLM Wiki as a native GTK 4 app, now as a Flatpak
+>
+> Hi, a tip in case it fits: gknowledge is an MIT-licensed GTK 4 + Libadwaita app that turns documents into a linked, cited Markdown wiki, offline by default, with optional Ollama or ChatGPT models. Version 0.3 adds a Flatpak for any distribution (tested on Ubuntu and Fedora 44), PDF import inside the sandbox, and pages that flag themselves when their source file changes. It also ships an MCP server so coding agents can use the same wiki.
+>
+> Release: https://github.com/openapi/gknowledge/releases/tag/v0.3.0
+> Install: `flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref`
+>
+> Disclosure: I maintain it.
+
+### r/selfhosted (New Project Friday, 30 October)
+
+**Title:** gknowledge: a self-hosted, offline "LLM wiki" that compiles your documents into a cited Markdown vault
+
+> I maintain this, so take it with that in mind.
+>
+> gknowledge follows Karpathy's LLM Wiki pattern: documents go into an immutable `sources/` folder, and a model (or the built-in offline engine, no model needed) compiles them into linked Markdown pages with provenance. Questions come back with citations. Everything stays on your disk as a plain folder you can open in Obsidian or back up with git.
+>
+> For self-hosters specifically: no cloud account, no telemetry, works with Ollama on the same box, and there's a stdio MCP server (`uvx gknowledge-mcp --init <folder>`) if you want agents on a headless machine to use the wiki without the desktop app.
+>
+> Desktop app is GTK 4 (Flatpak for any distro). Repo: https://github.com/openapi/gknowledge
+>
+> What would you need from it to replace your current notes or docs setup?
 
 ## Chinese communities
 

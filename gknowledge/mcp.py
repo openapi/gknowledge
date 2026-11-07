@@ -5,6 +5,7 @@ the wiki, read pages, ask cited questions and add new sources. Stdlib only,
 JSON-RPC 2.0 over stdio (newline-delimited).
 
     gknowledge-mcp /path/to/project
+    gknowledge-mcp --init /path/to/project   # create the project if missing
     python3 -m gknowledge.mcp /path/to/project
 
 Register with Claude Code:
@@ -20,6 +21,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from .core import lint
 from .core.ingestion import IngestionManager
 from .core.knowledge import KnowledgeWriter
 from .core.project import Project
@@ -71,6 +73,13 @@ TOOLS = [
             "path": {"type": "string", "description": "Absolute path of the file"},
             "ingest": {"type": "boolean", "default": True}},
             "required": ["path"]},
+    },
+    {
+        "name": "stale_sources",
+        "description": "Lint the wiki for drift: sources whose original file changed "
+                       "after ingestion, with the pages that still reflect the old "
+                       "version. Re-import or refresh them in the app.",
+        "inputSchema": {"type": "object", "properties": {}},
     },
     {
         "name": "recent_activity",
@@ -142,6 +151,17 @@ class WikiServer:
                             if ev in ("done", "warning", "error") else None)
         return "\n".join(notes) or "Imported."
 
+    def stale_sources(self) -> str:
+        stale = lint.stale_sources(self.project)
+        if not stale:
+            return "No drift: every ingested source matches its original file."
+        out = []
+        for s in stale:
+            out.append(f"- {s.source.title} ({s.source.origin_path}) changed since ingest; "
+                       f"{len(s.pages)} page(s) may be outdated:")
+            out += [f"  - {p.slug}" for p in s.pages]
+        return "\n".join(out)
+
     def recent_activity(self, limit: int = 20) -> str:
         rows = self.project.store.recent_log(int(limit))
         return "\n".join(f"- {r['op']}: {r['detail']}" for r in rows) or "No activity yet."
@@ -186,9 +206,14 @@ class WikiServer:
 
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    init = "--init" in argv
+    argv = [a for a in argv if a != "--init"]
     path = argv[0] if argv else os.environ.get("GKNOWLEDGE_PROJECT", "")
+    if path and init and not Project.is_project(path):
+        Project.create(path).close()
     if not path or not Project.is_project(path):
-        print("usage: gknowledge-mcp /path/to/gknowledge/project", file=sys.stderr)
+        print("usage: gknowledge-mcp [--init] /path/to/gknowledge/project",
+              file=sys.stderr)
         return 2
     server = WikiServer(Project.open(path))
     for line in sys.stdin:

@@ -1,0 +1,43 @@
+# PyPI distribution of the MCP server: the headless core and gknowledge-mcp,
+# without the GTK interface. Built by build-aux/pypi/build.sh, which stages
+# these files next to a copy of the package.
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gknowledge-mcp"
+dynamic = ["version"]
+description = "MCP server for gknowledge: let Claude Code, Codex or Cursor search, read and grow a Karpathy-style LLM wiki."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "gknowledge contributors" }]
+keywords = ["mcp", "mcp-server", "llm-wiki", "knowledge-base", "markdown", "claude-code", "codex", "cursor"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
+dependencies = []
+
+[project.optional-dependencies]
+pdf = ["pypdf>=4.0"]
+
+[project.urls]
+Homepage = "https://openapi.github.io/gknowledge"
+Source = "https://github.com/openapi/gknowledge"
+Issues = "https://github.com/openapi/gknowledge/issues"
+
+[project.scripts]
+gknowledge-mcp = "gknowledge.mcp:main"
+
+[tool.setuptools]
+packages = ["gknowledge", "gknowledge.core", "gknowledge.providers"]
+
+[tool.setuptools.dynamic]
+version = { attr = "gknowledge.__version__" }

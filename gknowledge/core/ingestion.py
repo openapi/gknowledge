@@ -9,6 +9,8 @@ background thread (UI) via :meth:`process_pending`.
 
 from __future__ import annotations
 
+import json
+import re
 import shutil
 import threading
 from dataclasses import dataclass
@@ -20,7 +22,9 @@ from ..providers.base import LLMProvider
 from . import parsers
 from .extraction import ExtractionPipeline
 from .hashing import hash_file
-from .models import Job, JobState, Source, SourceStatus, new_id, now
+from .knowledge import KnowledgeWriter
+from .lint import origin_of
+from .models import Job, JobState, PageKind, Source, SourceStatus, new_id, now
 from .project import Project
 
 # progress(event: str, job: Job, message: str) -> None
@@ -99,6 +103,149 @@ class IngestionManager:
             else:
                 imported.append(src)
         return ImportOutcome(imported=imported, skipped=skipped)
+
+    def reingest_source(self, source_id: str) -> Source | None:
+        """Clear stale provenance and queue a fresh extraction for a source."""
+        if self.is_running():
+            raise RuntimeError("Cannot re-ingest a source while ingestion is running.")
+        source = self.store.get_source(source_id)
+        if source is None:
+            return None
+        source_path = self._managed_path(self.project.sources_dir, source.rel_path)
+        if source_path is None or not source_path.is_file():
+            raise FileNotFoundError(f"Stored source file is missing: {source.rel_path}")
+
+        writer = self._detach_source(source)
+        self.store.delete_jobs_for_source(source.id)
+        self.store.delete_reviews_for_source(source.id)
+        source.status = SourceStatus.PENDING
+        self.store.upsert_source(source)
+        self.store.upsert_job(Job(source_id=source.id, state=JobState.QUEUED))
+        self.store.log("reingest", source.title)
+        writer.rebuild_index()
+        writer.rebuild_overview()
+        writer.append_log("re-ingest", source.title)
+        return source
+
+    def refresh_source(self, source_id: str) -> Source | None:
+        """Take the current content of a source's original file and re-ingest it.
+
+        Used when lint reports the original changed after ingestion: the stored
+        copy is replaced, the hash updated, and the old knowledge detached.
+        """
+        if self.is_running():
+            raise RuntimeError("Cannot refresh a source while ingestion is running.")
+        source = self.store.get_source(source_id)
+        if source is None:
+            return None
+        origin = origin_of(source)
+        if origin is None:
+            raise FileNotFoundError(f"Original file is missing: {source.origin_path}")
+        digest = hash_file(origin)
+        other = self.store.source_by_hash(digest)
+        if other and other.id != source.id:
+            raise ValueError(f"Same content is already imported as “{other.title}”.")
+
+        old_path = self._managed_path(self.project.sources_dir, source.rel_path)
+        dest = self.project.sources_dir / f"{origin.stem}-{digest[:8]}{origin.suffix}"
+        shutil.copy2(origin, dest)
+        if old_path is not None and old_path.is_file() and old_path != dest.resolve():
+            old_path.unlink()
+        source.rel_path = dest.name
+        source.sha256 = digest
+        source.size = dest.stat().st_size
+        self.store.upsert_source(source)
+        self.store.log("source.refresh", source.title)
+        return self.reingest_source(source.id)
+
+    def remove_source(self, source_id: str) -> Source | None:
+        """Remove the source and clean up knowledge no longer backed by it."""
+        if self.is_running():
+            raise RuntimeError("Cannot remove a source while ingestion is running.")
+        source = self.store.get_source(source_id)
+        if source is None:
+            return None
+
+        source_path = self._managed_path(self.project.sources_dir, source.rel_path)
+        writer = self._detach_source(source)
+        if source_path is not None and source_path.is_file():
+            source_path.unlink()
+        self.store.delete_source(source.id)
+        self.store.log("source.remove", source.title)
+        writer.rebuild_index()
+        writer.rebuild_overview()
+        writer.append_log("remove source", source.title)
+        return source
+
+    def _detach_source(self, source: Source) -> KnowledgeWriter:
+        """Remove a source's provenance, deleting only pages it solely supported."""
+        writer = KnowledgeWriter(self.project)
+        pages = self.store.pages_for_source(source.id)
+        source_page = next((p for p in pages if p.kind == PageKind.SOURCE), None)
+        source_slug = source_page.slug if source_page else None
+
+        for page in pages:
+            if page.kind == PageKind.SOURCE:
+                self._delete_page(page)
+                continue
+
+            page.sources = [sid for sid in page.sources if sid != source.id]
+            if not page.sources:
+                self._delete_page(page)
+                continue
+
+            page.body = writer.read_body(page)
+            if source_slug:
+                page.body = re.sub(
+                    rf"(?m)^[ \t]*-\s*\[\[{re.escape(source_slug)}(?:\|[^\]]+)?\]\][ \t]*(?:\r?\n|$)",
+                    "",
+                    page.body,
+                )
+                page.links = [slug for slug in page.links if slug != source_slug]
+            writer.write_page(page)
+
+        self._remove_source_mentions(source.id)
+        return writer
+
+    def _delete_page(self, page) -> None:
+        page_path = self._managed_path(self.project.knowledge_dir, page.rel_path)
+        if page_path is not None and page_path.is_file():
+            page_path.unlink()
+        self.store.delete_page(page.slug)
+
+    @staticmethod
+    def _managed_path(directory: str | Path, rel_path: str) -> Path | None:
+        root = Path(directory).resolve()
+        path = (root / rel_path).resolve()
+        return path if path != root and path.is_relative_to(root) else None
+
+    def _remove_source_mentions(self, source_id: str) -> None:
+        path = self.project.cache_dir / "mentions.json"
+        try:
+            mentions = json.loads(path.read_text("utf-8"))
+        except (OSError, ValueError):
+            return
+        if not isinstance(mentions, dict):
+            return
+        changed = False
+        for key, entry in list(mentions.items()):
+            if not isinstance(entry, dict):
+                continue
+            sources = entry.get("sources", [])
+            if not isinstance(sources, list):
+                continue
+            remaining = [sid for sid in sources if sid != source_id]
+            if remaining == sources:
+                continue
+            changed = True
+            if remaining:
+                entry["sources"] = remaining
+            else:
+                del mentions[key]
+        if changed:
+            path.write_text(
+                json.dumps(mentions, indent=1, ensure_ascii=False), "utf-8"
+            )
 
     def queue_all_pending_sources(self) -> int:
         """Ensure every non-ingested source has a queued job. Returns count."""

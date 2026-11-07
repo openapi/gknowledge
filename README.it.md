@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="data/icons/hicolor/scalable/apps/io.gknowledge.Gknowledge.svg" alt="" width="96">
+  <img src="data/icons/hicolor/scalable/apps/io.github.openapi.Gknowledge.svg" alt="" width="96">
 </p>
 
 <h1 align="center">gknowledge</h1>
 
-<p align="center"><a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <b>Italiano</b></p>
+<p align="center"><a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <b>Italiano</b> · <a href="README.fr.md">Français</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a></p>
 
 <p align="center">
   <b>La LLM Wiki di Karpathy come app nativa GNOME.</b><br>
@@ -42,7 +42,7 @@ sudo apt update && sudo apt install gknowledge
 Su qualsiasi distribuzione, con Flatpak (il runtime GNOME arriva da Flathub):
 
 ```bash
-flatpak install --user https://openapi.github.io/gknowledge/io.gknowledge.Gknowledge.flatpakref
+flatpak install --user https://openapi.github.io/gknowledge/io.github.openapi.Gknowledge.flatpakref
 ```
 
 ## Perché gknowledge

@@ -145,7 +145,14 @@ class Store:
         self.path = Path(db_path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._conn = _SharedConnection(str(self.path))
-        self._conn.execute("PRAGMA journal_mode=WAL")
+        # No WAL: its shared-memory index needs mmap, which the Flatpak
+        # document portal (projects picked with the file chooser) does not
+        # support, so a WAL database there fails with "disk I/O error" even
+        # to open. Exclusive locking lets SQLite read an older WAL database
+        # without that index long enough to convert it.
+        self._conn.execute("PRAGMA locking_mode=EXCLUSIVE")
+        self._conn.execute("PRAGMA journal_mode=DELETE")
+        self._conn.execute("PRAGMA locking_mode=NORMAL")
         self._conn.execute("PRAGMA foreign_keys=ON")
         self._migrate()
 
@@ -204,6 +211,8 @@ class Store:
         return [Source.from_row(dict(r)) for r in cur.fetchall()]
 
     def delete_source(self, source_id: str) -> None:
+        self.delete_jobs_for_source(source_id)
+        self.delete_reviews_for_source(source_id)
         self._conn.execute("DELETE FROM sources WHERE id=?", (source_id,))
         self._conn.commit()
 
@@ -279,6 +288,10 @@ class Store:
         )
         self._conn.commit()
 
+    def delete_reviews_for_source(self, source_id: str) -> None:
+        self._conn.execute("DELETE FROM reviews WHERE source_id=?", (source_id,))
+        self._conn.commit()
+
     def list_reviews(self, status: str | None = None) -> list[ReviewItem]:
         if status:
             cur = self._conn.execute(
@@ -305,6 +318,10 @@ class Store:
                    error=:error, updated_at=:updated_at""",
             r,
         )
+        self._conn.commit()
+
+    def delete_jobs_for_source(self, source_id: str) -> None:
+        self._conn.execute("DELETE FROM jobs WHERE source_id=?", (source_id,))
         self._conn.commit()
 
     def pending_jobs(self) -> list[Job]:

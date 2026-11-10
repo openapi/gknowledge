@@ -4,7 +4,7 @@
 
 <h1 align="center">gknowledge</h1>
 
-<p align="center"><a href="README.md">English</a> · <b>简体中文</b> · <a href="README.it.md">Italiano</a> · <a href="README.fr.md">Français</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a></p>
+<p align="center"><a href="README.md">English</a> · <b>简体中文</b> · <a href="README.it.md">Italiano</a> · <a href="README.fr.md">Français</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a> . <a href="README.bn.md">বাংলা</a></p> 
 
 <p align="center">
   <b>Karpathy 的 LLM Wiki，做成原生 GNOME 应用。</b><br>

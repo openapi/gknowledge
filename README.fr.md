@@ -4,7 +4,7 @@
 
 <h1 align="center">gknowledge</h1>
 
-<p align="center"><a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.it.md">Italiano</a> · <b>Français</b> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a></p>
+<p align="center"><a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.it.md">Italiano</a> · <b>Français</b> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a> . <a href="README.bn.md">বাংলা</a></p> 
 
 <p align="center">
   <b>Le LLM Wiki de Karpathy en application GNOME native.</b><br>

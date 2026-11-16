@@ -4,7 +4,7 @@
 
 <h1 align="center">gknowledge</h1>
 
-<p align="center"><a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.it.md">Italiano</a> · <b>Français</b> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a> . <a href="README.bn.md">বাংলা</a></p>
+<p align="center"><a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.it.md">Italiano</a> · <a href="README.fr.md">Français<//a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a> · <b>বাংলা</b></p>
 
 <p align="center">
   <b>কার্পেথির এলএলএম উইকি : নেটিভ GNOME অ্যাপ হিসেবে</b><br>
@@ -21,7 +21,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/gknowledge-demo.svg" alt="gknowledge en action : importer des articles d'IA, obtenir un wiki lié, poser des questions avec citations" width="880">
+  <img src="docs/gknowledge-demo.svg" alt="gknowledge এর কর্মপন্থা : এআই পেপার ইমপোর্ট করুন, লাভ করুন লিঙ্কড উইকি, প্রশ্ন করুন সাইটেশন সহ" width="880">
 </p>
 
 ## Installation
@@ -58,7 +58,7 @@ gknowledge একবার ইনস্টল করার পর ইন্ট�
 
 ## gknowledge কেন
  
-আপনি যদি [LLM Wiki](https://github.com/nashsu/llm_wiki), [Tolaria](https://github.com/refactoringhq/tolaria), [Reor](https://github.com/reorproject/reor) অথবা [Khoj](https://github.com/khoj-ai/khoj) ব্যবহার করে থাকেন, আপনি ইতোমধ্যে এই লুপ সম্পর্কে জানেন : **তথ্যের উৎস ইনজেস্ট করা, সেটা থেকে মডেল দ্বারা উইকি বানানো ও মেইনটেইন করা, উইকি থেকে প্রশ্নোত্তরের মাধ্যমে জানা।** gknowledge ঠিক একই কাজ করে, নোম অ্যাপ হিসেবে। 
+আপনি যদি [LLM Wiki](https://github.com/nashsu/llm_wiki), [Tolaria](https://github.com/refactoringhq/tolaria), [Reor](https://github.com/reorproject/reor) অথবা [Khoj](https://github.com/khoj-ai/khoj) ব্যবহার করে থাকেন, আপনি ইতোমধ্যে এই লুপ সম্পর্কে জানেন : **তথ্যের উৎস ইনজেস্ট করা, সেটা থেকে মডেল দ্বারা উইকি বানানো ও মেইনটেইন করা, উইকি থেকে প্রশ্নোত্তরের মাধ্যমে জানা।** gknowledge ঠিক একই কাজ করে, GNOME অ্যাপ হিসেবে। 
 
 - **নেটিভ অ্যাপ**, GTK 4 এবং Libadwaita : Electron, Tauri, বা ব্রাউজার ইঞ্জিন ছাড়াই।  
 - **একাউন্ট ছাড়াই ব্যবহারযোগ্য** : বিল্ট ইন হিউরিস্টিক ইঞ্জিন অফলাইনে তথ্য ইনজেস্ট করে উত্তর দেয়। উন্নততর অভিজ্ঞতার জন্য মডেল যোগ করা যায়।   

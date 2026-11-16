@@ -11,7 +11,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from gknowledge.core.ingestion import IngestionManager
 from gknowledge.core.knowledge import KnowledgeWriter
 from gknowledge.core.lint import ChangeDetector, stale_sources
-from gknowledge.core.models import Page, PageKind, Source, SourceStatus
+from gknowledge.core.models import (
+    Page, PageKind, ReviewAction, ReviewItem, Source, SourceStatus,
+)
 from gknowledge.core.project import Project, Settings
 from gknowledge.core.query import QueryEngine
 from gknowledge.providers import build_provider
@@ -30,6 +32,21 @@ def make_project(tmp: Path) -> Project:
     proj = Project.create(tmp / "proj", name="Test KB")
     proj.save_settings(Settings(provider="offline"))
     return proj
+
+
+def test_review_items_separate_questions_from_review_tasks():
+    question = ReviewItem(
+        title="What caused the change?",
+        action=ReviewAction.DEEP_RESEARCH,
+        queries=["What caused the change?"],
+    )
+    review_task = ReviewItem(
+        title="Check the proposed page",
+        action=ReviewAction.CREATE_PAGE,
+    )
+
+    assert question.is_question
+    assert not review_task.is_question
 
 
 def _write_minimal_epub(path: Path, chapter: str) -> None:

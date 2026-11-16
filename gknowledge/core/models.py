@@ -152,6 +152,10 @@ class ReviewItem:
     source_id: str = ""
     created_at: float = field(default_factory=now)
 
+    @property
+    def is_question(self) -> bool:
+        return self.action == ReviewAction.DEEP_RESEARCH
+
     def to_row(self) -> dict[str, Any]:
         return {
             "id": self.id,

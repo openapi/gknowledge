@@ -4,7 +4,7 @@
 
 <h1 align="center">gknowledge</h1>
 
-<p align="center"><a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.it.md">Italiano</a> · <a href="README.fr.md">Français<//a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a> · <b>বাংলা</b></p>
+<p align="center"><a href="README.md">English</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.it.md">Italiano</a> · <a href="README.fr.md">Français</a> · <a href="README.pt-BR.md">Português (BR)</a> · <a href="README.es.md">Español</a> · <b>বাংলা</b></p>
 
 <p align="center">
   <b>কার্পেথির এলএলএম উইকি : নেটিভ GNOME অ্যাপ হিসেবে</b><br>

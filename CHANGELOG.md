@@ -2,6 +2,16 @@
 
 All notable changes to gknowledge. Dates are release dates.
 
+## Unreleased
+
+**Dossiers**
+- Projects become **dossiers**. **New Dossier** asks only for a name: the dossier is a draft you can work in right away, and it gets a folder when you save it (**Save…**, Ctrl+S) or close the window. By default it is saved in `~/Documents/Dossiers/<name>` (the localised Documents folder); you can pick another folder. Closing with a draft open offers to save it or keep it as a draft for next time.
+- A saved dossier shows only what a person needs: a `<name>.dossier` launcher file (double-click opens it in gknowledge), `sources/`, `knowledge/` and `notes/`. The database, caches and settings move to a hidden `.dossier/` folder, excluded from git by a generated `.gitignore`.
+- Projects created with 0.3 or earlier open unchanged.
+
+**App**
+- Preferences: detect a local Ollama server and pick one of its models (thanks @AdityaWagh06, #46).
+
 ## 0.3.0 — 2026-10-19
 
 **Wiki**

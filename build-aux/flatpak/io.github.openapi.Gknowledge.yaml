@@ -11,8 +11,10 @@ finish-args:
   - --socket=wayland
   - --socket=fallback-x11
   - --device=dri
-  # No broad filesystem access: projects are chosen through Gtk.FileDialog,
-  # which goes through the document portal inside the sandbox.
+  # No broad filesystem access: new dossiers are saved by default in
+  # ~/Documents/Dossiers (localised Documents folder); any other folder is
+  # chosen through Gtk.FileDialog and the document portal.
+  - --filesystem=xdg-documents/Dossiers:create
 
 modules:
   # PDF import; pure Python, installed from the wheel without network access.

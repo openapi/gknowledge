@@ -132,7 +132,7 @@ class PreferencesDialog(Adw.PreferencesWindow):
         # For Ollama the model list comes from local server discovery.
         self._ollama_model_list = Gtk.StringList.new([])
         self._ollama_model_combo = Adw.ComboRow(title="Model", model=self._ollama_model_list,
-                                                subtitle="Discovered from local Ollama server")
+                                                subtitle="Discovered from Ollama server")
         self._ollama_model_combo.set_factory(_full_width_factory())
         self._ollama_model_combo.set_list_factory(_full_width_factory())
         self._ollama_model_combo.connect("notify::selected", self._on_ollama_model_changed)

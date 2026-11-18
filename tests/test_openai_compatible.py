@@ -20,6 +20,9 @@ from gknowledge.providers.openai_compatible import (
     OllamaUnavailable,
     discover_ollama_models,
     get_ollama_selection_state,
+    ollama_detect_endpoint,
+    ollama_host_label,
+    ollama_models_url,
     resolve_ollama_model_selection,
     should_prefill_ollama_base_url,
 )
@@ -177,3 +180,87 @@ def test_dropdown_index_maps_to_model_or_custom():
     assert get_ollama_selection_state(2, models) == (None, True)  # "Custom…"
     assert get_ollama_selection_state(-1, models) == (None, False)
     assert get_ollama_selection_state(0xFFFFFFFF, models) == (None, False)  # GTK_INVALID_LIST_POSITION
+
+
+# -- Detect at a custom Base URL (#57) ----------------------------------------
+
+@pytest.mark.parametrize("base_url", [
+    "http://192.168.1.50:11434",
+    "http://192.168.1.50:11434/",
+    "http://192.168.1.50:11434/v1",
+    "http://192.168.1.50:11434/v1/",
+    "  http://192.168.1.50:11434/v1  ",
+])
+def test_models_url_from_base_url(base_url):
+    assert ollama_models_url(base_url) == "http://192.168.1.50:11434/v1/models"
+
+
+def test_models_url_keeps_https_and_paths():
+    assert ollama_models_url("https://ollama.lan/proxy/v1") == "https://ollama.lan/proxy/v1/models"
+
+
+@pytest.mark.parametrize("base_url", [
+    "ftp://192.168.1.50:11434/v1",
+    "file:///etc/passwd",
+    "192.168.1.50:11434",
+    "http://",
+    "http://host:notaport/v1",
+])
+def test_models_url_rejects_non_http_urls(base_url):
+    with pytest.raises(ValueError):
+        ollama_models_url(base_url)
+
+
+def test_automatic_probe_always_stays_on_localhost():
+    for base_url in ("", "https://api.openai.com/v1", "http://192.168.1.50:11434/v1",
+                     "ftp://bad"):
+        assert ollama_detect_endpoint(base_url, explicit=False) == DEFAULT_OLLAMA_MODELS_URL
+
+
+def test_explicit_detect_uses_a_typed_base_url():
+    assert (ollama_detect_endpoint("http://192.168.1.50:11434/v1", explicit=True)
+            == "http://192.168.1.50:11434/v1/models")
+
+
+@pytest.mark.parametrize("base_url", ["", "   ", None, "https://api.openai.com/v1/"])
+def test_explicit_detect_without_a_typed_url_uses_localhost(base_url):
+    assert ollama_detect_endpoint(base_url, explicit=True) == DEFAULT_OLLAMA_MODELS_URL
+
+
+def test_explicit_detect_rejects_a_non_http_base_url_without_a_request():
+    with pytest.raises(ValueError):
+        ollama_detect_endpoint("ftp://192.168.1.50/v1", explicit=True)
+
+
+def test_host_label_names_host_and_port_only():
+    assert ollama_host_label(DEFAULT_OLLAMA_MODELS_URL) == "localhost:11434"
+    assert ollama_host_label("http://192.168.1.50:11434/v1/models") == "192.168.1.50:11434"
+    assert ollama_host_label("https://ollama.lan/v1/models") == "ollama.lan"
+    assert ollama_host_label("http://user:secret@10.0.0.2:11434/v1/models") == "10.0.0.2:11434"
+    assert ollama_host_label("http://[::1]:11434/v1/models") == "[::1]:11434"
+
+
+@pytest.mark.parametrize("suffix", ["", "/", "/v1", "/v1/"])
+def test_explicit_detect_lists_models_from_a_custom_base_url(ollama, suffix):
+    server = ollama(json.dumps({"object": "list", "data": [{"id": "remote:7b"}]}))
+    base_url = server.url.removesuffix("/v1/models") + suffix
+    endpoint = ollama_detect_endpoint(base_url, explicit=True)
+    assert discover_ollama_models(endpoint) == ["remote:7b"]
+    assert server.requests == [("GET", "/v1/models", 0)]
+
+
+def test_refused_connection_at_a_custom_base_url():
+    port = _free_port()
+    endpoint = ollama_detect_endpoint(f"http://127.0.0.1:{port}", explicit=True)
+    assert ollama_host_label(endpoint) == f"127.0.0.1:{port}"
+    with pytest.raises(OllamaUnavailable):
+        discover_ollama_models(endpoint)
+
+
+def test_slow_custom_base_url_times_out_as_unavailable(ollama):
+    server = ollama('{"data": []}', delay=1.0)
+    endpoint = ollama_detect_endpoint(server.url.removesuffix("/models"), explicit=True)
+    start = time.monotonic()
+    with pytest.raises(OllamaUnavailable):
+        discover_ollama_models(endpoint, timeout=0.2)
+    assert time.monotonic() - start < 1.0

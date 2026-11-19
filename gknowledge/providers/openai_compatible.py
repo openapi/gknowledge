@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import urllib.error
+import urllib.parse
 import urllib.request
 
 from .base import LLMMessage, LLMProvider, LLMResponse, ProviderError
@@ -85,7 +86,6 @@ class OpenAICompatibleProvider(LLMProvider):
         )
 
 
-
 DEFAULT_OLLAMA_BASE_URL = "http://localhost:11434/v1"
 DEFAULT_OLLAMA_MODELS_URL = f"{DEFAULT_OLLAMA_BASE_URL}/models"
 _OLLAMA_TIMEOUT = 2.0
@@ -146,6 +146,58 @@ def should_prefill_ollama_base_url(current_base_url: str | None) -> bool:
     """
     cleaned = (current_base_url or "").strip().rstrip("/")
     return not cleaned or cleaned == "https://api.openai.com/v1"
+
+
+def ollama_models_url(base_url: str) -> str:
+    """Turn an Ollama Base URL into its OpenAI-compatible models endpoint.
+
+    Surrounding spaces and trailing slashes are dropped and ``/v1`` is added
+    when missing, so ``http://host:11434`` and ``http://host:11434/v1/`` both
+    give ``http://host:11434/v1/models``.
+
+    Raises:
+        ValueError: the URL is not http(s) or has no host.
+    """
+    cleaned = (base_url or "").strip().rstrip("/")
+    parts = urllib.parse.urlsplit(cleaned)
+    try:
+        parts.port  # noqa: B018 - raises ValueError for an invalid port
+    except ValueError as exc:
+        raise ValueError("Base URL has an invalid port") from exc
+    if parts.scheme not in ("http", "https") or not parts.hostname:
+        raise ValueError("Base URL must start with http:// or https://")
+    if not cleaned.endswith("/v1"):
+        cleaned += "/v1"
+    return f"{cleaned}/models"
+
+
+def ollama_detect_endpoint(base_url: str | None, *, explicit: bool) -> str:
+    """Pick the models endpoint for an Ollama detection.
+
+    Only an explicit Detect click may use a Base URL the user typed. The
+    automatic probe, and a click while the Base URL is empty or still the
+    OpenAI default, go to the local default server.
+
+    Raises:
+        ValueError: an explicit detection with a Base URL that is not http(s).
+    """
+    if not explicit or should_prefill_ollama_base_url(base_url):
+        return DEFAULT_OLLAMA_MODELS_URL
+    return ollama_models_url(base_url or "")
+
+
+def ollama_host_label(endpoint: str) -> str:
+    """Return ``host:port`` of an endpoint for status messages.
+
+    Built from the host name and port only, so credentials or paths in the
+    URL never show up in the UI.
+    """
+    parts = urllib.parse.urlsplit(endpoint)
+    host = parts.hostname or endpoint
+    if ":" in host:  # IPv6 literal
+        host = f"[{host}]"
+    port = parts.port
+    return f"{host}:{port}" if port else host
 
 
 def resolve_ollama_model_selection(

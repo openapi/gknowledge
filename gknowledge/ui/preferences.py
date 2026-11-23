@@ -15,6 +15,8 @@ from ..providers.openai_compatible import (
     OllamaUnavailable,
     discover_ollama_models,
     get_ollama_selection_state,
+    ollama_detect_endpoint,
+    ollama_host_label,
     resolve_ollama_model_selection,
     should_prefill_ollama_base_url,
 )
@@ -130,7 +132,7 @@ class PreferencesDialog(Adw.PreferencesWindow):
         # For Ollama the model list comes from local server discovery.
         self._ollama_model_list = Gtk.StringList.new([])
         self._ollama_model_combo = Adw.ComboRow(title="Model", model=self._ollama_model_list,
-                                                subtitle="Discovered from local Ollama server")
+                                                subtitle="Discovered from Ollama server")
         self._ollama_model_combo.set_factory(_full_width_factory())
         self._ollama_model_combo.set_list_factory(_full_width_factory())
         self._ollama_model_combo.connect("notify::selected", self._on_ollama_model_changed)
@@ -239,7 +241,7 @@ class PreferencesDialog(Adw.PreferencesWindow):
 
     # -- Ollama local discovery ----------------------------------------------
     def _on_detect_clicked(self, *_a):
-        self._load_ollama_models()
+        self._load_ollama_models(explicit=True)
 
     def _on_ollama_model_changed(self, *_a):
         # "Custom…" reveals the free-text Model row; a discovered model hides it.
@@ -267,7 +269,16 @@ class PreferencesDialog(Adw.PreferencesWindow):
 
         return self._saved_ollama_model
 
-    def _load_ollama_models(self):
+    def _load_ollama_models(self, explicit: bool = False):
+        # Only an explicit Detect click may probe the Base URL the user typed;
+        # the automatic probe on provider change always stays on localhost.
+        try:
+            endpoint = ollama_detect_endpoint(self._base_url.get_text(), explicit=explicit)
+        except ValueError as exc:
+            self._ollama_row.set_subtitle(str(exc))
+            return
+        host = ollama_host_label(endpoint)
+
         self._ollama_request_id += 1
         req_id = self._ollama_request_id
         self._ollama_probe_in_flight = True
@@ -277,20 +288,19 @@ class PreferencesDialog(Adw.PreferencesWindow):
         current_model = self._get_current_ollama_model()
 
         def work():
-            # Always the local default: a URL left over from another provider
-            # must never receive an unrequested probe.
             try:
-                models = discover_ollama_models()
+                models = discover_ollama_models(endpoint)
                 err = None
             except OllamaUnavailable:
-                models, err = [], "No Ollama server found at localhost:11434"
+                models, err = [], f"No Ollama server found at {host}"
             except Exception as exc:  # noqa: BLE001
                 models, err = [], f"Could not list Ollama models: {str(exc)[:80]}"
-            GLib.idle_add(self._fill_ollama_models, req_id, current_model, models, err)
+            GLib.idle_add(self._fill_ollama_models, req_id, host, current_model, models, err)
 
         threading.Thread(target=work, daemon=True).start()
 
-    def _fill_ollama_models(self, req_id: int, current_model: str, models: list[str], err: str | None):
+    def _fill_ollama_models(self, req_id: int, host: str, current_model: str,
+                            models: list[str], err: str | None):
         if req_id != self._ollama_request_id:
             return False
 
@@ -322,7 +332,7 @@ class PreferencesDialog(Adw.PreferencesWindow):
 
         n = len(models)
         self._ollama_row.set_subtitle(
-            f"Ollama running at localhost ({n} model{'s' if n != 1 else ''} found)"
+            f"Ollama running at {host} ({n} model{'s' if n != 1 else ''} found)"
         )
         self._ollama_models = list(models)
 

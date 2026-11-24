@@ -212,7 +212,7 @@ def main(argv: list[str] | None = None) -> int:
     if path and init and not Project.is_project(path):
         Project.create(path).close()
     if not path or not Project.is_project(path):
-        print("usage: gknowledge-mcp [--init] /path/to/gknowledge/project",
+        print("usage: gknowledge-mcp [--init] /path/to/dossier",
               file=sys.stderr)
         return 2
     server = WikiServer(Project.open(path))

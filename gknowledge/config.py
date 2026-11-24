@@ -48,3 +48,11 @@ def add_recent_project(path: str) -> None:
     recent.insert(0, path)
     state["recent"] = recent[:10]
     save_state(state)
+
+
+def replace_recent_project(old: str, new: str) -> None:
+    """A draft was saved elsewhere: its recent entry follows it."""
+    state = load_state()
+    state["recent"] = [p for p in state.get("recent", []) if p not in (old, new)]
+    save_state(state)
+    add_recent_project(new)

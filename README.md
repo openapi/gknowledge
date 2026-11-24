@@ -151,6 +151,10 @@ For Cursor or other clients, add this to the MCP configuration:
 | `add_source` | import and ingest a file |
 | `recent_activity` | see what changed recently |
 
+Also listed in the [official MCP registry](https://registry.modelcontextprotocol.io) as `io.github.openapi/gknowledge` and on Glama:
+
+[![openapi/gknowledge MCP server](https://glama.ai/mcp/servers/openapi/gknowledge/badges/score.svg)](https://glama.ai/mcp/servers/openapi/gknowledge)
+
 ## Try it from source
 
 ```bash
